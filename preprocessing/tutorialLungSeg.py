@@ -41,7 +41,7 @@ def lumTrans(img):
 
 def lungSeg(imgs_to_process,output,name):
 
-    if os.path.exists(output+'/'+name+'_clean.npy') : return
+    #if os.path.exists(output+'/'+name+'_clean.npy') : return
 
     imgs_to_process = lumTrans(imgs_to_process)    
     x,y,z = imgs_to_process.shape 

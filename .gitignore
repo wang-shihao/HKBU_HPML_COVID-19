@@ -1,0 +1,13 @@
+## ginore this file ##
+*.pth
+*.log
+*.pyc
+*.swp
+*.pfm
+*_local.sh
+tmp
+data*
+weights
+.nfs*
+runs
+*.ipynb
