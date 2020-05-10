@@ -18,7 +18,6 @@ __all__ = [
 
 @DATASET_REGISTRY.register()
 def CTDataset(cfg):
-    input_size = cfg.input.size
     slice_num = cfg.dataset.slice_num
     root_dir = cfg.dataset.dir
     is_train = cfg.dataset.is_train
@@ -32,10 +31,10 @@ def CTDataset(cfg):
         loader = pil_loader
     transforms = build_transforms(cfg)
     label_transforms = build_label_transforms(cfg)
-    return _CTDataset(root_dir, data_list, is_train, slice_num, input_size, loader, transforms, label_transforms)
+    return _CTDataset(root_dir, data_list, is_train, slice_num, loader, transforms, label_transforms)
 
 class _CTDataset(torch.utils.data.Dataset):
-    def __init__(self, root_dir, data_list, is_train, slice_num, input_size, loader,
+    def __init__(self, root_dir, data_list, is_train, slice_num=64, loader=pil_loader,
                  transforms=None, label_transforms=None, *args, **kwargs):
         '''
         Args:
@@ -43,16 +42,14 @@ class _CTDataset(torch.utils.data.Dataset):
             data_list: the training of testing data list or json file. e.g., ct_train.json
             is_train: determine to load which type of dataset
             slice_num: the number of slices in a scan
-            input_size: the height and width of the transformed data
         '''
         self.root_dir = root_dir
         self.data_list = data_list
         self.is_train = is_train
         self.slice_num = slice_num
-        self.input_size = input_size
         self.transforms = transforms
         self.label_transforms = label_transforms
-        self.loader = pil_loader
+        self.loader = loader
         with open(self.data_list, 'r') as f:
             self.data = json.load(f)
         self.cls_to_label = {key:idx for idx, key in enumerate(self.data)} # {'CP': 0, 'NCP': 1, 'Normal': 2}
@@ -72,10 +69,11 @@ class _CTDataset(torch.utils.data.Dataset):
                             slice_path = os.path.join(scan_path, slice_)
                             if not os.path.exists(slice_path):
                                 slices.remove(slice_)
-                        samples[idx] = {'slices':slices, 'label': label, 'path': scan_path}
-                        idx += 1
+                        if len(slices)>0:
+                            samples[idx] = {'slices':slices, 'label': label, 'path': scan_path}
+                            idx += 1
         return samples
-                
+
     def __getitem__(self, idx):
         sample = self.samples[idx]
         label = torch.tensor(sample['label']).long()

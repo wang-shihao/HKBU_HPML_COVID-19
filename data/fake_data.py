@@ -5,7 +5,7 @@ __all__ = [
     'FakeData',
     '_FakeData'
 ]
-z
+
 class _FakeData(torch.utils.data.Dataset):
     def __init__(self, size=[224,224], num=1):
         if isinstance(size, int):
