@@ -72,12 +72,40 @@ class Processor():
             tmp = self.rm_single(repeat_ids, slices)
         return tmp
 
-    def process(self, debug=False, CT=CT):
+    def process1(self, debug=False, CT={}, path='/home/datasets/CCCCI_cleaned/dataset_cleaned/'):
+        # if debug: set_trace()
+        missed = []
+        for line in data:
+            try:
+                cls_name, pid, scan_id, is_seg, is_repeat, repeat_ids, re_order = line.split(',')
+                slice_path = os.path.join(path,f"{cls_name}/{pid}/{scan_id}")
+                slices = os.listdir(slice_path)
+                for slice_ in slices:
+                    sp = os.path.join(slice_path, slice_)
+                    if not os.path.exists(sp): slices.remove(slice_)
+                if len(slices) == 0:
+                    print(f'there is no image in {line}')
+                    continue
+                if pid not in CT[cls_name]: CT[cls_name][pid] = {}
+                if re_order:
+                    slices = self.reorder(re_order, slices)
+                if is_repeat=='1' or repeat_ids:
+                    slices = self.remove_noise(repeat_ids, slices)
+                if len(slices)>0: CT[cls_name][pid][scan_id] = slices
+            except Exception as e:
+                missed.append(line)
+                print(e)
+
+        with open('CT_seg_data.json', 'w') as f:
+            json.dump(CT,f, indent=4, sort_keys=True)
+            print("Saving CT data to CT_seg_data.json")
+
+    def process2(self, debug=False, CT={}, path='/home/datasets/CCCCI_cleaned/raw/'):
         # if debug: set_trace()
         try:
             for line in data:
                 cls_name, pid, scan_id, is_seg, is_repeat, repeat_ids, re_order = line.split(',')
-                slice_path = f"./{cls_name}/{pid}/{scan_id}"
+                slice_path = os.path.join(path,f"{cls_name}/{pid}/{scan_id}")
                 slices = os.listdir(slice_path)
                 if len(slices) == 0:
                     print(f'there is no image in {line}')
@@ -90,7 +118,7 @@ class Processor():
                 if len(slices)>0: CT[cls_name][pid][scan_id] = slices
             with open('CT_data.json', 'w') as f:
                 json.dump(CT,f, indent=4, sort_keys=True)
-                print("Saving CT data to CT_data.json")
+                print("Saving CT data to CT_seg_data.json")
         except Exception as e:
             print(e)
 
@@ -101,7 +129,7 @@ class Processor():
 
 if __name__ == '__main__':
     with open('CT_cleaned_v2.csv', 'r') as f:
-        data = f.read().split('\n')
+        data = f.read().rstrip().split('\n')
         print(data[0])
         data = data[1:]
         print(data[1240:1250])
@@ -110,4 +138,5 @@ if __name__ == '__main__':
     processor = Processor()
     debug = False
     # debug = True
-    processor.process(debug, CT)
+    processor.process1(debug, CT)
+    #processor.process2(debug, CT)
