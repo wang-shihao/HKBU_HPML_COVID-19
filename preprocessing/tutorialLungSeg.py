@@ -1,4 +1,5 @@
 import numpy as np
+import re
 import pandas as pd
 from skimage import morphology
 from skimage import measure
@@ -12,7 +13,6 @@ import cv2
 from scipy.ndimage.morphology import binary_dilation,generate_binary_structure
 from skimage.morphology import convex_hull_image
 import multiprocessing
-
 
 
 
@@ -43,7 +43,6 @@ def lumTrans(img):
 
 
 
-
 def lungSeg(imgs_to_process,output,name):
 
     if os.path.exists(output+'/'+name+'_clean.npy') : return
@@ -69,7 +68,7 @@ def lungSeg(imgs_to_process,output,name):
     #print "on image", img_file
     for i in range(len(imgs_to_process)):
         img = imgs_to_process[i]
-	x,y = img.shape
+        x,y = img.shape
         #Standardize the pixel values
         allmean = np.mean(img)
         allstd = np.std(img)
@@ -153,6 +152,7 @@ def lungSeg(imgs_to_process,output,name):
     #sliceim = img_array*imgs_to_process
 
     x,y,z = sliceim.shape
+    #print(output)
     if not os.path.exists(output): 
         os.makedirs(output)
     #print(sliceim.shape)
@@ -166,7 +166,10 @@ def lungSeg(imgs_to_process,output,name):
     #im = Image.fromarray(img_to_save.squeeze())
     im = Image.fromarray(img_to_save)
 
-    im.save(os.path.join(output,name+'.png'), 'PNG')
+    print(output + name + '.png')
+
+    im.save(output + name + '.png', 'PNG')
+    #im.save(os.path.join(output,name+'.png'), 'PNG')
     #np.save(os.path.join(output,name+'_clean.npy'),sliceim.reshape(1,x,y,z))
     #np.save(os.path.join(output,name+'_label.npy'),np.array([[0,0,0,0]]))
     #lb = Image.fromarray(sliceim.reshape(1, x, y, z))
@@ -175,7 +178,7 @@ def lungSeg(imgs_to_process,output,name):
 
 if __name__ == "__main__":
     tmpfile = './datalist.txt'
-    luna_data = '../../dataset'
+    luna_data = '/home/datasets/CCCCI_cleaned/raw'
     if not os.path.exists(tmpfile):
         splits = os.listdir(luna_data)
         patients = []
@@ -197,21 +200,41 @@ if __name__ == "__main__":
 
     filelist = imgs
 
-    ref = pd.read_csv('CT_cleaned.csv')
+    ref = pd.read_csv('CT_cleaned.csv').fillna(0)
     
 
-    
-    p = multiprocessing.Pool(12)
+    tmplist = []
+    p = multiprocessing.Pool(40)
+    logfile = open('./seg.log', 'w')
     for afile in filelist:
-        output = afile.split('/0')[0].replace('dataset', 'dataset_cleaned')
-        name = afile.split('/0')[1].split('.')[0]
-        print(afile)
+        #print(afile)
+        #output = afile.split('/0')[0].replace('raw', 'dataset_cleaned')
+        output = re.split('/0[0-9]+.', afile)[0].replace('raw', 'dataset_cleaned')
+        #name = afile.split('/0')[1].split('.')[0]
+        name = re.findall('/0[0-9]+.', afile)[0].split('.')[0]
+        #print(output)
         scan_id = afile.split('/')[-2]
         #print(type(scan_id))
-        if ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0] == 0:
-            print(ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0])
+        print(afile)
+        print(ref.loc[ref.scan_id==int(scan_id)].is_seg.values)
+        print(int(scan_id))
+        print(ref.loc[ref.scan_id==int(scan_id)].values)
+        try:
+            needed_to_be_seged = ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0]
+        except:
+            logfile.write(afile + '\n')
+            continue
+        if needed_to_be_seged == 0:
+            #print(ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0])
             p.apply_async(lungSeg, (afile, output, name,))
-
             #lungSeg(afile,output,name)
+    #            tmplist.append(output)
+
+    #tmplist = set(tmplist) 
+    #for line in tmplist:
+    #    logfile.write(line + "\n")
+        
+    logfile.flush()
+    logfile.close()
     p.close()
     p.join()
