@@ -99,6 +99,7 @@ class Processor():
         with open('CT_seg_data.json', 'w') as f:
             json.dump(CT,f, indent=4, sort_keys=True)
             print("Saving CT data to CT_seg_data.json")
+        return CT
 
     def process2(self, debug=False, CT={}, path='/home/datasets/CCCCI_cleaned/raw/'):
         # if debug: set_trace()
@@ -119,6 +120,7 @@ class Processor():
             with open('CT_data.json', 'w') as f:
                 json.dump(CT,f, indent=4, sort_keys=True)
                 print("Saving CT data to CT_seg_data.json")
+            return CT
         except Exception as e:
             print(e)
 
