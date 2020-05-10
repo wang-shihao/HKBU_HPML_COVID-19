@@ -1,0 +1,29 @@
+input:
+    size: (224,224)
+model:
+    name: 'mc3_18'
+    classes: 3
+    pretrained: True
+dataset:
+    name: 'CTDataset'
+    slice_num: 64
+    batch_size: 1
+    dir: '/home/datasets/CCCCI_cleaned/dataset_cleaned'
+    train_list: '/home/datasets/CCCCI_cleaned/json/ct_train.json'
+    valid_list: '/home/datasets/CCCCI_cleaned/json/ct_test.json'
+    test_list: '/home/datasets/CCCCI_cleaned/json/ct_test.json'
+    is_train: False
+transforms:
+    name: 'CTTransforms'
+topk: [1,1]
+hooks:
+    early_stopping:
+        setting: 2
+        patience: 20
+        monitor: 'val_acc_1'
+        mode: 'max'
+    model_checkpoint:
+        setting: 2
+        monitor: 'val_acc_1'
+        mode: 'max'
+        filepath: ''
