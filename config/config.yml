@@ -9,9 +9,9 @@ dataset:
     slice_num: 64
     batch_size: 1
     dir: '/home/datasets/CCCCI_cleaned/dataset_cleaned'
-    train_list: '/home/datasets/CCCCI_cleaned/json/ct_train.json'
-    valid_list: '/home/datasets/CCCCI_cleaned/json/ct_test.json'
-    test_list: '/home/datasets/CCCCI_cleaned/json/ct_test.json'
+    train_list: './data/ct_train.json'
+    valid_list: './data/ct_test.json'
+    test_list: './data/ct_test.json'
     is_train: False
 transforms:
     name: 'CTTransforms'
