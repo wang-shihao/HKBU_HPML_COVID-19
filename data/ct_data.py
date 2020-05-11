@@ -65,10 +65,10 @@ class _CTDataset(torch.utils.data.Dataset):
                     label = self.cls_to_label[cls_]
                     scan_path = os.path.join(self.root_dir,cls_,pid,scan_id)
                     if os.path.exists(scan_path):
-                        for slice_ in slices:
-                            slice_path = os.path.join(scan_path, slice_)
-                            if not os.path.exists(slice_path):
-                                slices.remove(slice_)
+                        # for slice_ in slices:
+                        #     slice_path = os.path.join(scan_path, slice_)
+                        #     if not os.path.exists(slice_path):
+                        #         slices.remove(slice_)
                         if len(slices)>0:
                             samples[idx] = {'slices':slices, 'label': label, 'path': scan_path}
                             idx += 1
