@@ -227,21 +227,22 @@ if __name__ == "__main__":
         #print(ref.loc[ref.scan_id==int(scan_id)].is_seg.values)
         #print(int(scan_id))
         #print(ref.loc[ref.scan_id==int(scan_id)].values)
-        try:
-            needed_to_be_seged = ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0]
-        except:
-            logfile.write("Error: " + afile + '\n')
-            continue
-        if needed_to_be_seged == 0:
-            #print(ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0])
-            logfile.write("Seg " + afile + '\n')
-            p.apply_async(lungSeg, (afile, output, name,))
-            #lungSeg(afile,output,name)
-            #tmplist.append(output)
-        else:
-            #print(output)
-            logfile.write("Cpy" + afile + '\n')
-            p.apply_async(savepng, (afile, output, name,))
+        #try:
+        #    needed_to_be_seged = ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0]
+        #except:
+        #    logfile.write("Error: " + afile + '\n')
+        #    continue
+        #if needed_to_be_seged == 0:
+        #    #print(ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0])
+        #    logfile.write("Seg " + afile + '\n')
+        #    p.apply_async(lungSeg, (afile, output, name,))
+        #    #lungSeg(afile,output,name)
+        #    #tmplist.append(output)
+        #else:
+        #    #print(output)
+        #    logfile.write("Cpy" + afile + '\n')
+        #    p.apply_async(savepng, (afile, output, name,))
+        p.apply_async(savepng, (afile, output, name,))
 
 
     #tmplist = set(tmplist) 

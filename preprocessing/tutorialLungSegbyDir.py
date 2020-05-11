@@ -44,24 +44,25 @@ def lumTrans(img):
     return newimg
 
 
-def savepng(imgs_to_save, output, name):
-    imgs_to_save = Image.open(imgs_to_save)
-    if not os.path.exists(output):
-        os.makedirs(output)
-    imgs_to_save.save(output + name + '.png', 'PNG')
+def savepng(img_to_save, output, name):
+    imgs_to_process = Image.open(imgs_to_process)
+    imgs_to_process.save(output + name + '.png', 'PNG')
 
 
 def lungSeg(imgs_to_process,output,name):
 
     if os.path.exists(output+'/'+name+'_clean.npy') : return
     imgs_to_process = Image.open(imgs_to_process)
+    imgs_to_process,_,_ = imgs_to_process.split()
+    #imgs_to_process = imgs_to_process
+
     #imgs_to_process = cv2.imread(imgs_to_process)
     img_to_save = imgs_to_process.copy()
     img_to_save = np.asarray(img_to_save).astype('uint8')
 
     imgs_to_process = lumTrans(imgs_to_process)    
     imgs_to_process = np.expand_dims(imgs_to_process, axis=0)
-    print(imgs_to_process.shape)
+    #print(imgs_to_process.shape)
     x,y,z = imgs_to_process.shape 
     #if y!=512 : continue
   
@@ -76,6 +77,7 @@ def lungSeg(imgs_to_process,output,name):
     #print "on image", img_file
     for i in range(len(imgs_to_process)):
         img = imgs_to_process[i]
+        print(img.shape)
         x,y = img.shape
         #Standardize the pixel values
         allmean = np.mean(img)
@@ -208,47 +210,32 @@ if __name__ == "__main__":
 
     filelist = imgs
 
-    ref = pd.read_csv('CT_cleaned_v2.csv').fillna(0)
-    
+    p = multiprocessing.Pool(20)
+    #ref = pd.read_csv('CT_cleaned_v2.csv').fillna(0)
+    ref = pd.read_csv('new_missed.csv').fillna(0)
+    for _, line in ref.iterrows():
+        #print(line)
+        pid = line['pid']
+        cls = line.cls
+        scan_id = line.scan_id
+        is_seg = line.is_seg
+        rawdir = "/home/datasets/CCCCI_cleaned/raw/{}/{}/{}".format(cls, pid, scan_id)
+        print(rawdir)
+        for rimg in os.listdir(rawdir):
+            print(rimg)
+            img_path = os.path.join(rawdir, rimg)
+            output = rawdir.replace('raw', 'dataset_cleaned') + '/'
+            name = rimg.split('.')[0]
+            print("Processing {}".format(img_path))
+            if is_seg == 1:
+                #p.apply_async(savepng, (img_path, output, name,))
+                savepng(img_path, output, name)
+            else:
+                #p.apply_async(lungSeg, (img_path, output, name,))
+                lungSeg(img_path, output, name)
 
-    tmplist = []
-    p = multiprocessing.Pool(40)
-    logfile = open('./seg.log', 'w')
-    for afile in filelist:
-        #print(afile)
-        #output = afile.split('/0')[0].replace('raw', 'dataset_cleaned')
-        output = re.split('/0[0-9]+.', afile)[0].replace('raw', 'dataset_cleaned')
-        #name = afile.split('/0')[1].split('.')[0]
-        name = re.findall('/0[0-9]+.', afile)[0].split('.')[0]
-        #print(output)
-        scan_id = afile.split('/')[-2]
-        #print(type(scan_id))
-        #print(afile)
-        #print(ref.loc[ref.scan_id==int(scan_id)].is_seg.values)
-        #print(int(scan_id))
-        #print(ref.loc[ref.scan_id==int(scan_id)].values)
-        try:
-            needed_to_be_seged = ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0]
-        except:
-            logfile.write("Error: " + afile + '\n')
-            continue
-        if needed_to_be_seged == 0:
-            #print(ref.loc[ref.scan_id==int(scan_id)].is_seg.values[0])
-            logfile.write("Seg " + afile + '\n')
-            p.apply_async(lungSeg, (afile, output, name,))
-            #lungSeg(afile,output,name)
-            #tmplist.append(output)
-        else:
-            #print(output)
-            logfile.write("Cpy" + afile + '\n')
-            p.apply_async(savepng, (afile, output, name,))
-
-
-    #tmplist = set(tmplist) 
-    #for line in tmplist:
-    #    logfile.write(line + "\n")
-        
-    logfile.flush()
-    logfile.close()
     p.close()
     p.join()
+
+
+
