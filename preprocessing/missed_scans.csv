@@ -1,3 +1,4 @@
+cls,pid,scan_id,is_seg,is_repeat,repeat_ids,re_order
 NCP,816,2325,0,0,,
 NCP,821,2331,0,0,,
 NCP,822,2332,0,0,,
