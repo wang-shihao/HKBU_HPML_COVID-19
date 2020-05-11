@@ -8,10 +8,10 @@ dataset:
     name: 'CTDataset'
     slice_num: 64
     batch_size: 1
-    dir: '/home/datasets/CCCCI_cleaned/dataset_cleaned'
-    train_list: './data/ct_train_seg.json'
-    valid_list: './data/ct_test_seg.json'
-    test_list: './data/ct_test_seg.json'
+    dir: '/home/datasets/CCCCI_cleaned/dataset_seg'
+    train_list: './data/ct_seg_train.json'
+    valid_list: './data/ct_seg_test.json'
+    test_list: './data/ct_seg_test.json'
     is_train: False
 transforms:
     name: 'CTTransforms'
