@@ -73,7 +73,7 @@ class Processor():
         return tmp
 
     def process1(self, debug=False, CT={}, path='/home/datasets/CCCCI_cleaned/dataset_cleaned/'):
-        # if debug: set_trace()
+        if debug: set_trace()
         missed = []
         for line in data:
             try:
@@ -98,11 +98,11 @@ class Processor():
 
         with open('CT_seg_data.json', 'w') as f:
             json.dump(CT,f, indent=4, sort_keys=True)
-            print("Saving CT data to CT_seg_data.json")
+            print("Saving CT segmented data to CT_seg_data.json")
         return CT
 
     def process2(self, debug=False, CT={}, path='/home/datasets/CCCCI_cleaned/raw/'):
-        # if debug: set_trace()
+        if debug: set_trace()
         try:
             for line in data:
                 cls_name, pid, scan_id, is_seg, is_repeat, repeat_ids, re_order = line.split(',')
@@ -117,9 +117,9 @@ class Processor():
                 if is_repeat=='1' or repeat_ids:
                     slices = self.remove_noise(repeat_ids, slices)
                 if len(slices)>0: CT[cls_name][pid][scan_id] = slices
-            with open('CT_data.json', 'w') as f:
+            with open('CT_cleaned_data.json', 'w') as f:
                 json.dump(CT,f, indent=4, sort_keys=True)
-                print("Saving CT data to CT_seg_data.json")
+                print("Saving CT cleaned data to CT_cleaned_data.json")
             return CT
         except Exception as e:
             print(e)

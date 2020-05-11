@@ -35,13 +35,13 @@ def split_dataset(CT_file, suffix=''):
     print(num_info)
     for cls_name in CT:
         print(f"{cls_name} All={len(CT[cls_name])} Train={len(ct_tr[cls_name])} Test={len(ct_te[cls_name])}")
-    with open(f'ct_train{suffix}.json', 'w') as f:
+    with open(f'ct{suffix}_train.json', 'w') as f:
         json.dump(ct_tr, f, indent=4)
-    with open(f'ct_test{suffix}.json', 'w') as f:
+    with open(f'ct{suffix}_test.json', 'w') as f:
         json.dump(ct_te, f, indent=4)
-    with open(f'ct_num_info{suffix}.json', 'w') as f:
+    with open(f'ct{suffix}_num_info.json', 'w') as f:
         json.dump(num_info, f, indent=4)
 
 if __name__ == '__main__':
-    # split_dataset('CT_seg_data.json', '_seg')
-    split_dataset('CT_data.json', '')
+    split_dataset('CT_seg_data.json', '_seg')
+    #split_dataset('CT_cleaned_data.json', '_cleaned')
