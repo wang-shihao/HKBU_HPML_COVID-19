@@ -1,4 +1,8 @@
+
+from collections import OrderedDict
+import torch
 from torchline.engine import build_module, MODULE_REGISTRY, DefaultModule
+from torchline.utils import topk_acc, AverageMeterGroup
 
 __all__ = [
     'CTModule'
@@ -17,46 +21,45 @@ class CTModule(DefaultModule):
         :param batch:
         :return:
         """
+        try:
+            # forward pass
+            inputs, gt_labels, paths = batch
+            predictions = self.forward(inputs)
 
-        # forward pass
-        inputs, gt_labels = batch
-        predictions = self.forward(inputs)
+            # calculate loss
+            loss_val = self.loss(predictions, gt_labels)
 
-        # calculate loss
-        loss_val = self.loss(predictions, gt_labels)
+            # acc
+            acc_results = topk_acc(predictions, gt_labels, self.cfg.topk)
+            tqdm_dict = {}
 
-        # acc
-        acc_results = topk_acc(predictions, gt_labels, self.cfg.topk)
-        tqdm_dict = {}
+            if self.on_gpu:
+                acc_results = [torch.tensor(x).to(loss_val.device.index) for x in acc_results]
 
-        if self.on_gpu:
-            acc_results = [torch.tensor(x).to(loss_val.device.index) for x in acc_results]
+            # in DP mode (default) make sure if result is scalar, there's another dim in the beginning
+            if self.trainer.use_dp or self.trainer.use_ddp2:
+                loss_val = loss_val.unsqueeze(0)
+                acc_results = [x.unsqueeze(0) for x in acc_results]
 
-        # in DP mode (default) make sure if result is scalar, there's another dim in the beginning
-        if self.trainer.use_dp or self.trainer.use_ddp2:
-            loss_val = loss_val.unsqueeze(0)
-            acc_results = [x.unsqueeze(0) for x in acc_results]
+            tqdm_dict['train_loss'] = loss_val
+            for i, k in enumerate(self.cfg.topk):
+                tqdm_dict[f'train_acc_{k}'] = acc_results[i]
 
-        tqdm_dict['train_loss'] = loss_val
-        for i, k in enumerate(self.cfg.topk):
-            tqdm_dict[f'train_acc_{k}'] = acc_results[i]
+            output = OrderedDict({
+                'loss': loss_val,
+                'progress_bar': tqdm_dict,
+                'log': tqdm_dict
+            })
 
-        output = OrderedDict({
-            'loss': loss_val,
-            'progress_bar': tqdm_dict,
-            'log': tqdm_dict
-        })
+            self.train_meters.update({key: val.item() for key, val in tqdm_dict.items()})
+            self.print_log(batch_idx, True, inputs, self.train_meters)
 
-        self.train_meters.update({key: val.item() for key, val in tqdm_dict.items()})
-        self.print_log(batch_idx, True, inputs, self.train_meters)
-
-        # can also return just a scalar instead of a dict (return loss_val)
-        return output
-
-    def training_end(self, outputs):
-        tqdm_dict = {key: val.avg for key, val in self.train_meters.meters.items()}
-        result = {'progress_bar': tqdm_dict, 'log': tqdm_dict, 'valid_loss': self.train_meters.meters['train_loss'].avg}
-        return result
+            # can also return just a scalar instead of a dict (return loss_val)
+            return output
+        except Exception as e:
+            print(str(e))
+            print(batch_idx, paths)
+            pass
 
     def validation_step(self, batch, batch_idx):
         """
@@ -64,7 +67,7 @@ class CTModule(DefaultModule):
         :param batch:
         :return:
         """
-        inputs, gt_labels = batch
+        inputs, gt_labels, paths = batch
         predictions = self.forward(inputs)
 
         loss_val = self.loss(predictions, gt_labels)

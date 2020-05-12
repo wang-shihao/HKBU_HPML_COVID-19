@@ -89,7 +89,7 @@ class _CTDataset(torch.utils.data.Dataset):
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3)
         if self.label_transforms: label = self.label_transforms(label)
-        return slice_tensor, label
+        return slice_tensor, label, sample['path']
 
     def __len__(self):
         return len(self.samples)
