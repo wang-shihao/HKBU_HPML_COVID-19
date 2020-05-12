@@ -1,0 +1,59 @@
+{
+    "patient": {
+        "train": {
+            "CP": 778,
+            "NCP": 726,
+            "Normal": 660
+        },
+        "test": {
+            "CP": 186,
+            "NCP": 190,
+            "Normal": 158
+        },
+        "total": {
+            "CP": 964,
+            "NCP": 916,
+            "Normal": 818
+        }
+    },
+    "scan": {
+        "train": {
+            "CP": 1210,
+            "NCP": 1213,
+            "Normal": 772
+        },
+        "test": {
+            "CP": 303,
+            "NCP": 302,
+            "Normal": 193
+        },
+        "total": {
+            "CP": 1513,
+            "NCP": 1515,
+            "Normal": 965
+        }
+    },
+    "slice": {
+        "train": {
+            "CP": 106878,
+            "NCP": 106075,
+            "Normal": 59164
+        },
+        "test": {
+            "CP": 28160,
+            "NCP": 25442,
+            "Normal": 14471
+        },
+        "total": {
+            "CP": 135038,
+            "NCP": 131517,
+            "Normal": 73635
+        }
+    },
+    "slice_info": {
+        "min": 9,
+        "max": 457,
+        "mean": 85.19659403956925,
+        "all": 340190
+    }
+}
