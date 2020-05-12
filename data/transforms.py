@@ -1,6 +1,6 @@
 from torchline.data.transforms import TRANSFORMS_REGISTRY
-import torchvision as tv
-import torchvision.transforms.functional as TF
+import torchio
+import torchio.transforms as iotf
 import numpy as np
 
 __all__ = [
@@ -11,30 +11,54 @@ __all__ = [
 @TRANSFORMS_REGISTRY.register()
 def CTTransforms(cfg):
     is_train = cfg.dataset.is_train
+    slice_num = cfg.dataset.slice_num
     img_size = cfg.input.size
-
-    img_tf = cfg.transforms.img
-    # rotate
-    is_rotate = img_tf.random_rotation.enable
-    rotate_degrees = img_tf.random_rotation.degrees
-    # flip
-    vflip = img_tf.random_vertical_flip.enable
-    hflip = img_tf.random_horizontal_flip.enable
-    return _CTTransforms(is_train, img_size)
+    randomflip = cfg.transforms.ct.randomflip
+    randomaffine = cfg.transforms.ct.randomaffine
+    randomblur = cfg.transforms.ct.randomblur
+    randomnoise = cfg.transforms.ct.randomnoise
+    randomswap = cfg.transforms.ct.randomswap
+    randomelasticdeformation = cfg.transforms.ct.randomelasticdeformation
+    return _CTTransforms(
+        is_train = is_train,
+        slice_num = slice_num,
+        img_size = img_size,
+        randomflip = randomflip,
+        randomaffine = randomaffine,
+        randomblur = randomblur,
+        randomnoise = randomnoise,
+        randomswap = randomswap,
+        randomelasticdeformation = randomelasticdeformation
+    )
+    
 
 class _CTTransforms(object):
-    def __init__(self, is_train, img_size,
-                 is_rotate=False, rotate_degrees=0,
-                 hflip=False, vflip=False,
-                 is_htrans=False, htrans=0,
-                 is_vtrans=False, vtrans=0,
-                 is_bright=False, brightness_factor=1,
-                 is_contrast=False, contrast_factor=1,
+    '''built on torchio
+        https://torchio.readthedocs.io/index.html
+    '''
+    def __init__(self, is_train, slice_num, img_size,
                  mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5],
+                 randomflip={'enable':0, 'axes':(1,2), 'p':0.5, 'flip_probability':0.5},
+                 randomaffine={'enable':0, 'scales':(0.5,0.5), 'degress': (-10,10), 'isotropic': True, 'p': 0.5},
+                 randomblur={'enable':0, 'std':(0,4), 'p':0.5},
+                 randomnoise={'enable':0, 'mean':(0,0.25), 'std':(0,0.25), 'p':0.5},
+                 randomswap={'enable':0, 'patch_size': (16,16,16), 'num_iterations':100, 'p':0.5},
+                 randomelasticdeformation={'enable':0, 'num_control_points':(4,4,4),
+                                        'max_displacement':(7.5,7.5,7.5), 'locked_borders':2, 'p':0.5},
                  *args, **kwargs):
         self.is_train = is_train
+        self.slice_num = slice_num
         self.img_size = img_size
-        self.normsize = tv.transforms.Normalize(mean, std)
+        self.randomflip = randomflip
+        self.randomaffine = randomaffine
+        self.randomblur = randomblur
+        self.randomnoise = randomnoise
+        self.randomswap = randomswap
+        self.randomelasticdeformation = randomelasticdeformation
+        if isinstance(self.img_size, list) or isinstance(self.img_size, tuple):
+            self.volume_size = (3, slice_num, *img_size)
+        elif isinstance(self.img_size, int):
+            self.volume_size = (3, slice_num, img_size, img_size)
         self.transform = self.get_transform()
 
     def get_transform(self):
@@ -50,48 +74,33 @@ class _CTTransforms(object):
 
     @property
     def valid_transform(self):
-        transform = tv.transforms.Compose([
-            tv.transforms.Resize(self.img_size),
-            tv.transforms.ToTensor(),
-            self.normsize
+        transform = iotf.Compose([
+            iotf.CropOrPad(self.volume_size),
+            iotf.ZNormalization()
         ])
         return transform
 
     @property
     def train_transform(self):
-        transform = tv.transforms.Compose([
-            tv.transforms.Resize(self.img_size),
-            tv.transforms.ToTensor(),
-            self.normsize
-        ])
+        tf_list = [iotf.CropOrPad(self.volume_size)]
+        if self.randomflip['enable']:
+            params = {key:val for key,val in self.randomflip.items() if key != 'enable'}
+            tf_list.append(iotf.RandomFlip(**params))
+        if self.randomaffine['enable']:
+            params = {key:val for key,val in self.randomaffine.items() if key != 'enable'}
+            tf_list.append(iotf.RandomAffine(**params))
+        if self.randomblur['enable']:
+            params = {key:val for key,val in self.randomblur.items() if key != 'enable'}
+            tf_list.append(iotf.RandomBlur(**params))
+        if self.randomnoise['enable']:
+            params = {key:val for key,val in self.randomnoise.items() if key != 'enable'}
+            tf_list.append(iotf.RandomNoise(**params))
+        if self.randomswap['enable']:
+            params = {key:val for key,val in self.randomswap.items() if key != 'enable'}
+            tf_list.append(iotf.RandomSwap(**params))
+        if self.randomelasticdeformation['enable']:
+            params = {key:val for key,val in self.randomelasticdeformation.items() if key != 'enable'}
+            tf_list.append(iotf.RandomElasticDeformation(**params))
+        tf_list.append(iotf.ZNormalization())
+        transform = iotf.Compose(tf_list)
         return transform
-        
-    def rotate(self, degree=10):
-        pass
-
-    def vtranslation(self):
-        pass
-
-    def htranslation(self):
-        pass
-
-    def hflip(self, is_flip=True):
-        pass
-
-    def vflip(self, is_flip=True):
-        pass
-
-    def crop(self):
-        pass
-
-    def resize(self):
-        pass
-
-    def contrast(self):
-        pass
-
-    def bright(self):
-        pass
-
-    def normsize(self, mean, std):
-        pass

@@ -7,7 +7,7 @@ model:
 dataset:
     name: 'CTDataset'
     slice_num: 64
-    batch_size: 1
+    batch_size: 2
     dir: '/home/datasets/CCCCI_cleaned/dataset_seg'
     train_list: './data/ct_train.json'
     valid_list: './data/ct_test.json'
@@ -16,6 +16,8 @@ dataset:
 transforms:
     name: 'CTTransforms'
 topk: [1,1]
+module:
+    name: 'CTModule'
 hooks:
     early_stopping:
         setting: 2
@@ -27,3 +29,6 @@ hooks:
         monitor: 'valid_acc_1'
         mode: 'max'
         filepath: ''
+trainer:
+    min_steps: 99999999
+    max_steps: 99999999

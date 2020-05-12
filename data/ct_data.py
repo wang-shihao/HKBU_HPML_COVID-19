@@ -4,7 +4,7 @@ import random
 
 import cv2
 import torch
-import torchvision as TF
+import torchvision.transforms as TF
 from torchline.data import (DATASET_REGISTRY, build_label_transforms,
                             build_transforms)
 
@@ -29,12 +29,14 @@ def CTDataset(cfg):
         loader = cv2.imread
     else:
         loader = pil_loader
+    img_size = cfg.input.size
     transforms = build_transforms(cfg)
     label_transforms = build_label_transforms(cfg)
-    return _CTDataset(root_dir, data_list, is_train, slice_num, loader, transforms, label_transforms)
+    return _CTDataset(root_dir, data_list, img_size, is_train, slice_num, loader,
+                    transforms, label_transforms)
 
 class _CTDataset(torch.utils.data.Dataset):
-    def __init__(self, root_dir, data_list, is_train, slice_num=64, loader=pil_loader,
+    def __init__(self, root_dir, data_list, is_train, img_size=[224,224], slice_num=64, loader=pil_loader,
                  transforms=None, label_transforms=None, *args, **kwargs):
         '''
         Args:
@@ -46,10 +48,13 @@ class _CTDataset(torch.utils.data.Dataset):
         self.root_dir = root_dir
         self.data_list = data_list
         self.is_train = is_train
+        self.img_size = img_size
         self.slice_num = slice_num
         self.transforms = transforms
         self.label_transforms = label_transforms
         self.loader = loader
+        self.args = args
+        self.kwargs = kwargs
         with open(self.data_list, 'r') as f:
             self.data = json.load(f)
         self.cls_to_label = {key:idx for idx, key in enumerate(self.data)} # {'CP': 0, 'NCP': 1, 'Normal': 2}
@@ -65,29 +70,34 @@ class _CTDataset(torch.utils.data.Dataset):
                     label = self.cls_to_label[cls_]
                     scan_path = os.path.join(self.root_dir,cls_,pid,scan_id)
                     if os.path.exists(scan_path):
-                        # for slice_ in slices:
-                        #     slice_path = os.path.join(scan_path, slice_)
-                        #     if not os.path.exists(slice_path):
-                        #         slices.remove(slice_)
                         if len(slices)>0:
                             samples[idx] = {'slices':slices, 'label': label, 'path': scan_path}
                             idx += 1
         return samples
 
+    def preprocessing(self, img):
+        transform = TF.Compose([
+            TF.CenterCrop(self.img_size),
+            TF.ToTensor()
+        ])
+        return transform(img)
+
     def __getitem__(self, idx):
         sample = self.samples[idx]
         label = torch.tensor(sample['label']).long()
-        slices = Resampler.resample(sample['slices'], self.slice_num)
+        if self.is_train:
+            slices = Resampler.resample(sample['slices'], self.slice_num)
         path = sample['path']
         slice_tensor = []
 
         for slice_ in slices:
             slice_path = os.path.join(path, slice_)
             img = self.loader(slice_path) # height * width * 3
-            if self.transforms: img = self.transforms.transform(img)
+            img = self.preprocessing(img)
             slice_tensor.append(img)
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3)
+        if self.transforms: slice_tensor = self.transforms(slice_tensor)
         if self.label_transforms: label = self.label_transforms(label)
         return slice_tensor, label, sample['path']
 
