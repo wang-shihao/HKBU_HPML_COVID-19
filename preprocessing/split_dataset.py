@@ -43,5 +43,5 @@ def split_dataset(CT_file, suffix=''):
         json.dump(num_info, f, indent=4)
 
 if __name__ == '__main__':
-    split_dataset('CT_seg_data.json', '_seg')
+    split_dataset('CT_data.json', '')
     #split_dataset('CT_cleaned_data.json', '_cleaned')
