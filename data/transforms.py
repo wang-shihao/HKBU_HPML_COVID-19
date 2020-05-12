@@ -56,7 +56,7 @@ class _CTTransforms(object):
         self.randomswap = randomswap
         self.randomelasticdeformation = randomelasticdeformation
         if isinstance(self.img_size, list) or isinstance(self.img_size, tuple):
-            self.volume_size = (3, slice_num, *img_size)
+            self.volume_size = (slice_num, *img_size)
         elif isinstance(self.img_size, int):
             self.volume_size = (3, slice_num, img_size, img_size)
         self.transform = self.get_transform()

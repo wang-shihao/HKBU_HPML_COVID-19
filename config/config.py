@@ -51,7 +51,7 @@ def add_config(cfg):
     ################################################################
     cfg.transforms.ct = CN()
     cfg.transforms.ct.randomflip = CN()
-    cfg.transforms.ct.randomflip.enabel = 1
+    cfg.transforms.ct.randomflip.enable = 1
     cfg.transforms.ct.randomflip.p = 0.5 
     cfg.transforms.ct.randomflip.axes = (0, 1,2) 
     cfg.transforms.ct.randomflip.flip_probability = 0.5

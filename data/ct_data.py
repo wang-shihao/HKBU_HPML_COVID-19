@@ -32,7 +32,7 @@ def CTDataset(cfg):
     img_size = cfg.input.size
     transforms = build_transforms(cfg)
     label_transforms = build_label_transforms(cfg)
-    return _CTDataset(root_dir, data_list, img_size, is_train, slice_num, loader,
+    return _CTDataset(root_dir, data_list, is_train, img_size, slice_num, loader,
                     transforms, label_transforms)
 
 class _CTDataset(torch.utils.data.Dataset):
@@ -87,6 +87,8 @@ class _CTDataset(torch.utils.data.Dataset):
         label = torch.tensor(sample['label']).long()
         if self.is_train:
             slices = Resampler.resample(sample['slices'], self.slice_num)
+        else:
+            slices = sample['slices']
         path = sample['path']
         slice_tensor = []
 
@@ -97,8 +99,8 @@ class _CTDataset(torch.utils.data.Dataset):
             slice_tensor.append(img)
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3)
-        if self.transforms: slice_tensor = self.transforms(slice_tensor)
-        if self.label_transforms: label = self.label_transforms(label)
+        if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
+        if self.label_transforms: label = self.label_transforms.transform(label)
         return slice_tensor, label, sample['path']
 
     def __len__(self):
