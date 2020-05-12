@@ -58,7 +58,7 @@ class _CTTransforms(object):
         if isinstance(self.img_size, list) or isinstance(self.img_size, tuple):
             self.volume_size = (slice_num, *img_size)
         elif isinstance(self.img_size, int):
-            self.volume_size = (3, slice_num, img_size, img_size)
+            self.volume_size = (slice_num, img_size, img_size)
         self.transform = self.get_transform()
 
     def get_transform(self):
@@ -75,14 +75,14 @@ class _CTTransforms(object):
     @property
     def valid_transform(self):
         transform = iotf.Compose([
-            iotf.CropOrPad(self.volume_size),
-            iotf.ZNormalization()
+            iotf.CropOrPad(self.volume_size, padding_mode='edge'),
+            #iotf.ZNormalization()
         ])
         return transform
 
     @property
     def train_transform(self):
-        tf_list = [iotf.CropOrPad(self.volume_size)]
+        tf_list = [iotf.CropOrPad(self.volume_size, padding_mode='edge')]
         if self.randomflip['enable']:
             params = {key:val for key,val in self.randomflip.items() if key != 'enable'}
             tf_list.append(iotf.RandomFlip(**params))
@@ -101,6 +101,6 @@ class _CTTransforms(object):
         if self.randomelasticdeformation['enable']:
             params = {key:val for key,val in self.randomelasticdeformation.items() if key != 'enable'}
             tf_list.append(iotf.RandomElasticDeformation(**params))
-        tf_list.append(iotf.ZNormalization())
+        #tf_list.append(iotf.ZNormalization())
         transform = iotf.Compose(tf_list)
         return transform

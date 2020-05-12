@@ -100,6 +100,7 @@ class _CTDataset(torch.utils.data.Dataset):
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3)
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
+        slice_tensor = (slice_tensor-slice_tensor.mean())/(slice_tensor.std()+1e-5)
         if self.label_transforms: label = self.label_transforms.transform(label)
         return slice_tensor, label, sample['path']
 
