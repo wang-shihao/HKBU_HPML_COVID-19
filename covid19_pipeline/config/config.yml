@@ -1,5 +1,5 @@
 DEFAULT_CUDNN_BENCHMARK: True
-SEED: 882
+SEED: 666
 VERSION: 1
 abtfs:
     blur:
@@ -59,6 +59,10 @@ hooks:
         filepath: ''
         mode: 'max'
         monitor: 'valid_acc_1'
+        period: 1
+        prefix: ''
+        save_top_k: 1
+        save_weights_only: False
         setting: 2
         verbose: 1
 input:
@@ -119,7 +123,6 @@ trainer:
     benchmark: False
     check_val_every_n_epoch: 1
     default_root_dir: './output'
-    default_save_path: './output'
     distributed_backend: 'dp'
     fast_dev_run: False
     gpus: [0, 1]
@@ -130,7 +133,7 @@ trainer:
         mlflow:
             experiment_name: 'torchline_logs'
             tracking_uri: './output'
-        setting: 0
+        setting: 2
         test_tube:
             name: 'torchline_logs'
             save_dir: './output'
