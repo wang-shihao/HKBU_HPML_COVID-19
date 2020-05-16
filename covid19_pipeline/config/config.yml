@@ -83,8 +83,9 @@ loss:
 model:
     classes: 3
     finetune: False
-    name: 'mc3_18'
+    name: 'densenet3d'
     pretrained: False
+    model_depth: 121
 module:
     name: 'CTModule'
 optim:

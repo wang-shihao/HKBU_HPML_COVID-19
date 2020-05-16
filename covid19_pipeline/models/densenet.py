@@ -190,4 +190,4 @@ def generate_model(model_depth, **kwargs):
 
 @META_ARCH_REGISTRY.register()
 def densenet3d(cfg):
-    return generate_model(cfg)
+    return generate_model(cfg.model.model_depth, num_classes=cfg.model.classes)

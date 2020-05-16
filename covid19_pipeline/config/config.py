@@ -10,6 +10,9 @@ def add_config(cfg):
     '''
     cfg.dataset.slice_num = 64
     
+    # model_depth
+    cfg.model.model_depth = 121
+    
     cfg.transforms.tensor.normalization.mean = [0.5, 0.5, 0.5]
     cfg.transforms.tensor.normalization.std = [0.5, 0.5, 0.5]
 
