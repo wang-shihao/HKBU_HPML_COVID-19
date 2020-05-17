@@ -1,0 +1,6 @@
+model,batch_size,slice_num,gpus,dataset,valid_acc1,transform,marks
+mc3_18,8,64,2,clean,85.12, , ,
+mc3_18,8,64,2,seg,83.75, , , ,
+r3d_18,8,64,2,seg,79.62, , , ,
+r2plus1d_18,8,64,2,seg,68.62, , , ,
+mc3_18,8,90,4,seg,78.25, , , ,

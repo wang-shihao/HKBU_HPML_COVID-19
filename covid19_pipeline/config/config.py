@@ -12,41 +12,6 @@ def add_config(cfg):
     
     # model_depth
     cfg.model.model_depth = 121
-    
-    cfg.transforms.tensor.normalization.mean = [0.5, 0.5, 0.5]
-    cfg.transforms.tensor.normalization.std = [0.5, 0.5, 0.5]
-
-    # resize
-    cfg.transforms.img.resize =  CN()
-    cfg.transforms.img.resize.enable = 1
-
-    # random_crop
-    cfg.transforms.img.random_crop = CN()
-    cfg.transforms.img.random_crop.enable = 1
-
-    # color_jitter
-    cfg.transforms.img.color_jitter = CN()
-    cfg.transforms.img.color_jitter.enable = 0
-    cfg.transforms.img.color_jitter.brightness = 0.1
-    cfg.transforms.img.color_jitter.contrast = 0.1
-    cfg.transforms.img.color_jitter.saturation = 0.1
-    cfg.transforms.img.color_jitter.hue = 0.1
-
-    # horizontal_flip
-    cfg.transforms.img.random_horizontal_flip = CN()
-    cfg.transforms.img.random_horizontal_flip.enable = 1
-    cfg.transforms.img.random_horizontal_flip.p = 0.5
-
-    # vertical_flip
-    cfg.transforms.img.random_vertical_flip = CN()
-    cfg.transforms.img.random_vertical_flip.enable = 1
-    cfg.transforms.img.random_vertical_flip.p = 0.5
-
-    # random_rotation
-    cfg.transforms.img.random_rotation = CN()
-    cfg.transforms.img.random_rotation.enable = 1
-    cfg.transforms.img.random_rotation.degrees = 10
-
 
     ################################################################
     # ct transforms                                                #
@@ -61,7 +26,7 @@ def add_config(cfg):
 
     cfg.transforms.ct.randomaffine = CN()
     cfg.transforms.ct.randomaffine.enable = 0 
-    cfg.transforms.ct.randomaffine.scale = (0.5,0.5)
+    cfg.transforms.ct.randomaffine.scales = (0.5,0.5)
     cfg.transforms.ct.randomaffine.degrees = (-10,10)
     cfg.transforms.ct.randomaffine.isotropic = True
     cfg.transforms.ct.randomaffine.p = 0.5
@@ -87,7 +52,7 @@ def add_config(cfg):
     cfg.transforms.ct.randomelasticdeformation.enable = 0
     cfg.transforms.ct.randomelasticdeformation.p = 0.5
     cfg.transforms.ct.randomelasticdeformation.num_control_points = (4,4,4)
-    cfg.transforms.ct.randomelasticdeformation.max_displacement = (7.5,7.5,7.5)
-    cfg.transforms.ct.randomelasticdeformation.locked_borders = 2
+    cfg.transforms.ct.randomelasticdeformation.max_displacement = (7,7,7)
+    cfg.transforms.ct.randomelasticdeformation.locked_borders = 0
 
     return cfg

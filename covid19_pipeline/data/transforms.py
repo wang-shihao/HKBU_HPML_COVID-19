@@ -45,7 +45,7 @@ class _CTTransforms(object):
                  randomnoise={'enable':0, 'mean':(0,0.25), 'std':(0,0.25), 'p':0.5},
                  randomswap={'enable':0, 'patch_size': (16,16,16), 'num_iterations':100, 'p':0.5},
                  randomelasticdeformation={'enable':0, 'num_control_points':(4,4,4),
-                                        'max_displacement':(7.5,7.5,7.5), 'locked_borders':2, 'p':0.5},
+                                        'max_displacement':(7,7,7), 'locked_borders':0, 'p':0.5},
                  *args, **kwargs):
         self.is_train = is_train
         self.slice_num = slice_num
@@ -56,7 +56,7 @@ class _CTTransforms(object):
         self.randomnoise = randomnoise
         self.randomswap = randomswap
         self.randomelasticdeformation = randomelasticdeformation
-        self.normalize = torchvision.transforms.Normalize(mean, std)
+        # self.normalize = torchvision.transforms.Normalize(mean, std)
         if isinstance(self.img_size, list) or isinstance(self.img_size, tuple):
             self.volume_size = (slice_num, *img_size)
         elif isinstance(self.img_size, int):
@@ -67,18 +67,17 @@ class _CTTransforms(object):
         if not self.is_train: 
             print('Generating validation transform ...')
             transform = self.valid_transform
-            print(f'Valid transform={transform}')
+            print(f'Valid transform={transform.transform}')
         else:
             print('Generating training transform ...')
             transform = self.train_transform
-            print(f'Train transform={transform}')
+            print(f'Train transform={transform.transform}')
         return transform
 
     @property
     def valid_transform(self):
         transform = iotf.Compose([
             # iotf.CropOrPad(self.volume_size, padding_mode='edge'),
-            self.normalize
         ])
         return transform
 
@@ -104,6 +103,5 @@ class _CTTransforms(object):
         if self.randomelasticdeformation['enable']:
             params = {key:val for key,val in self.randomelasticdeformation.items() if key != 'enable'}
             tf_list.append(iotf.RandomElasticDeformation(**params))
-        tf_list.append(self.normalize)
         transform = iotf.Compose(tf_list)
         return transform

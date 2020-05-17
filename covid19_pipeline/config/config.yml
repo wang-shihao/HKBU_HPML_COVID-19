@@ -175,15 +175,15 @@ transforms:
             enable: 0
             isotropic: True
             p: 0.5
-            scale: (0.5, 0.5)
+            scales: (0.5, 0.5)
         randomblur:
             enable: 0
             p: 0.5
             std: (0, 4)
         randomelasticdeformation:
             enable: 0
-            locked_borders: 2
-            max_displacement: (7.5, 7.5, 7.5)
+            locked_borders: 0
+            max_displacement: (7, 7, 7)
             num_control_points: (4, 4, 4)
             p: 0.5
         randomflip:

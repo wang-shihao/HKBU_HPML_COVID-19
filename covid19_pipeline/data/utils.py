@@ -77,7 +77,6 @@ class SystematicResampler(Resampler):
         original_num = len(slices)
         add_num = threshold - original_num
         add_idxs = list(range(original_num))
-        repetitions = add_num / len(slices)
         if add_num % original_num == 0:
             repetitions = add_num // original_num
         else:
@@ -88,8 +87,6 @@ class SystematicResampler(Resampler):
 
         remain_num = threshold - len(add_idxs)
         if remain_num == 0:
-            for idx in sorted(add_idxs):
-                tmp.append(slices[idx])
             return tmp
         else:
             interval = original_num // remain_num
@@ -113,11 +110,34 @@ class SystematicResampler(Resampler):
 
     @staticmethod
     def undersample(slices, threshold=64):
-        d = int(len(slices)/threshold)
         tmp = []
-        index = d
-        while len(tmp) < threshold:
-            tmp.append(slices[index])
-            index += d
+        original_num = len(slices)
+        add_idxs = []
+        remain_num = threshold
+        interval = original_num // remain_num
+        idx = original_num // 2 if original_num%2==1 else original_num//2 -1
+        remain_list = [idx]
+        count = 1
+        flag = 'right'
+        while len(remain_list) < remain_num:
+            if flag == 'right':
+                idx = idx + count * interval
+                flag = 'left'
+            elif flag == 'left':
+                idx = idx - count * interval
+                flag = 'right'
+            count += 1
+            remain_list.append(idx)
+        add_idxs.extend(remain_list)
+        for idx in sorted(add_idxs):
+            tmp.append(slices[idx])
         return tmp
+
+        # d = int(len(slices)/threshold)
+        # tmp = []
+        # index = d
+        # while len(tmp) < threshold:
+        #     tmp.append(slices[index])
+        #     index += d
+        # return tmp
 
