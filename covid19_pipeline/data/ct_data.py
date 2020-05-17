@@ -8,7 +8,7 @@ import torchvision.transforms as TF
 from torchline.data import (DATASET_REGISTRY, build_label_transforms,
                             build_transforms)
 
-from .utils import Resampler, pil_loader
+from .utils import SystematicResampler, pil_loader
 
 
 __all__ = [
@@ -86,7 +86,7 @@ class _CTDataset(torch.utils.data.Dataset):
         sample = self.samples[idx]
         label = torch.tensor(sample['label']).long()
         if self.is_train:
-            slices = Resampler.resample(sample['slices'], self.slice_num)
+            slices = SystematicResampler.resample(sample['slices'], self.slice_num)
         else:
             slices = sample['slices']
         path = sample['path']
