@@ -1,6 +1,7 @@
 from torchline.data.transforms import TRANSFORMS_REGISTRY
 import torchio
 import torchio.transforms as iotf
+import torchvision
 import numpy as np
 
 __all__ = [
@@ -55,6 +56,7 @@ class _CTTransforms(object):
         self.randomnoise = randomnoise
         self.randomswap = randomswap
         self.randomelasticdeformation = randomelasticdeformation
+        self.normalize = torchvision.transforms.Normalize(mean, std)
         if isinstance(self.img_size, list) or isinstance(self.img_size, tuple):
             self.volume_size = (slice_num, *img_size)
         elif isinstance(self.img_size, int):
@@ -75,14 +77,15 @@ class _CTTransforms(object):
     @property
     def valid_transform(self):
         transform = iotf.Compose([
-            iotf.CropOrPad(self.volume_size, padding_mode='edge'),
-            #iotf.ZNormalization()
+            # iotf.CropOrPad(self.volume_size, padding_mode='edge'),
+            self.normalize
         ])
         return transform
 
     @property
     def train_transform(self):
-        tf_list = [iotf.CropOrPad(self.volume_size, padding_mode='edge')]
+        # tf_list = [iotf.CropOrPad(self.volume_size, padding_mode='edge')]
+        tf_list = []
         if self.randomflip['enable']:
             params = {key:val for key,val in self.randomflip.items() if key != 'enable'}
             tf_list.append(iotf.RandomFlip(**params))
@@ -101,6 +104,6 @@ class _CTTransforms(object):
         if self.randomelasticdeformation['enable']:
             params = {key:val for key,val in self.randomelasticdeformation.items() if key != 'enable'}
             tf_list.append(iotf.RandomElasticDeformation(**params))
-        #tf_list.append(iotf.ZNormalization())
+        tf_list.append(self.normalize)
         transform = iotf.Compose(tf_list)
         return transform

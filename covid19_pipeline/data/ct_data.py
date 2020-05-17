@@ -8,7 +8,7 @@ import torchvision.transforms as TF
 from torchline.data import (DATASET_REGISTRY, build_label_transforms,
                             build_transforms)
 
-from .utils import SystematicResampler, pil_loader
+from .utils import SystematicResampler, RandomResampler, pil_loader
 
 
 __all__ = [
@@ -76,7 +76,9 @@ class _CTDataset(torch.utils.data.Dataset):
         return samples
 
     def preprocessing(self, img):
+        resize = self.img_size[0] + 4
         transform = TF.Compose([
+            TF.Resize((resize, resize)),
             TF.CenterCrop(self.img_size),
             TF.ToTensor()
         ])
@@ -86,9 +88,9 @@ class _CTDataset(torch.utils.data.Dataset):
         sample = self.samples[idx]
         label = torch.tensor(sample['label']).long()
         if self.is_train:
-            slices = SystematicResampler.resample(sample['slices'], self.slice_num)
+            slices = RandomResampler.resample(sample['slices'], self.slice_num)
         else:
-            slices = sample['slices']
+            slices = SystematicResampler.resample(sample['slices'], self.slice_num)
         path = sample['path']
         slice_tensor = []
 
@@ -100,7 +102,7 @@ class _CTDataset(torch.utils.data.Dataset):
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3)
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
-        slice_tensor = (slice_tensor-slice_tensor.mean())/(slice_tensor.std()+1e-5)
+        # slice_tensor = (slice_tensor-slice_tensor.mean())/(slice_tensor.std()+1e-5)
         if self.label_transforms: label = self.label_transforms.transform(label)
         return slice_tensor, label, sample['path']
 
