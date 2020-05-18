@@ -13,7 +13,7 @@ class WideBottleneck(resnet.Bottleneck):
     expansion = 2
 
 
-def generate_model(model_depth, k=8, **kwargs):
+def generate_model(model_depth, k=2, **kwargs):
     assert model_depth in [50, 101, 152, 200]
 
     inplanes = [x * k for x in resnet.get_inplanes()]

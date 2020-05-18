@@ -14,9 +14,9 @@ model_names = {
     'r2plus1d_18': [],
     'densenet3d': [121,169,201,264],
     'resnet3d': [10,18,34,50,101,152,200],
-    # 'wide_resnet3d': [50,101,152,200],
-    'resnext3d': [50,101,152,200],
-    'preact_resnet3d': [10,18,34,50,101,152,200],
+    'wide_resnet3d': [50,101,152,200],
+    # 'resnext3d': [50,101,152,200],
+    # 'preact_resnet3d': [10,18,34,50,101,152,200],
 }
 
 for name in model_names:
