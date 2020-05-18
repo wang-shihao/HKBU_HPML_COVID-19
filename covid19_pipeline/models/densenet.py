@@ -80,7 +80,7 @@ class DenseNet(nn.Module):
         bn_size (int) - multiplicative factor for number of bottle neck layers
           (i.e. bn_size * k features in the bottleneck layer)
         drop_rate (float) - dropout rate after each dense layer
-        num_classes (int) - number of classification classes
+        classes (int) - number of classification classes
     """
 
     def __init__(self,
@@ -93,7 +93,7 @@ class DenseNet(nn.Module):
                  num_init_features=64,
                  bn_size=4,
                  drop_rate=0,
-                 num_classes=1000):
+                 classes=1000):
 
         super().__init__()
 
@@ -139,7 +139,7 @@ class DenseNet(nn.Module):
                 m.bias.data.zero_()
 
         # Linear layer
-        self.classifier = nn.Linear(num_features, num_classes)
+        self.classifier = nn.Linear(num_features, classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
@@ -190,4 +190,4 @@ def generate_model(model_depth, **kwargs):
 
 @META_ARCH_REGISTRY.register()
 def densenet3d(cfg):
-    return generate_model(cfg.model.model_depth, num_classes=cfg.model.classes)
+    return generate_model(cfg.model.model_depth, classes=cfg.model.classes)

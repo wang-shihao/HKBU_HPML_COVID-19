@@ -111,4 +111,4 @@ def generate_model(model_depth, **kwargs):
 
 @META_ARCH_REGISTRY.register()
 def preact_resnet3d(cfg):
-    return generate_model(cfg)
+    return generate_model(cfg.model.model_depth, classes=cfg.model.classes)

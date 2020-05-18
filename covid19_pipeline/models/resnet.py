@@ -115,7 +115,7 @@ class ResNet(nn.Module):
                  no_max_pool=False,
                  shortcut_type='B',
                  widen_factor=1.0,
-                 n_classes=400):
+                 classes=400):
         super().__init__()
 
         block_inplanes = [int(x * widen_factor) for x in block_inplanes]
@@ -151,7 +151,7 @@ class ResNet(nn.Module):
                                        stride=2)
 
         self.avgpool = nn.AdaptiveAvgPool3d((1, 1, 1))
-        self.fc = nn.Linear(block_inplanes[3] * block.expansion, n_classes)
+        self.fc = nn.Linear(block_inplanes[3] * block.expansion, classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
@@ -239,4 +239,4 @@ def generate_model(model_depth, **kwargs):
 
 @META_ARCH_REGISTRY.register()
 def resnet3d(cfg):
-    return generate_model(cfg)
+    return generate_model(cfg.model.model_depth,classes=cfg.model.classes)
