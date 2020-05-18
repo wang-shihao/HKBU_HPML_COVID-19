@@ -96,7 +96,7 @@ optim:
         gamma: 0.1
         milestones: [10, 25, 35, 50]
         mode: 'min'
-        name: 'MultiStepLR'
+        name: 'CosineAnnealingLR'
         patience: 10
         step_size: 10
         t_0: 5
