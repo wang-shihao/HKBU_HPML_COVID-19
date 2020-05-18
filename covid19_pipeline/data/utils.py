@@ -18,7 +18,9 @@ class Resampler(object):
             slices: the list of slices that requires upsampling.
             threshold: the expected number of slices
         '''
-        if threshold >= len(slices):
+        if threshold == len(slices):
+            return slices
+        elif threshold > len(slices):
             return self.upsample(slices, threshold)
         else:
             return self.undersample(slices, threshold)
@@ -67,7 +69,7 @@ class SystematicResampler(Resampler):
         re = SystematicResampler()
         re.resample(a,15) # [0, 0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 5, 5, 6, 6]
         re.resample(a,10) # [0, 1, 1, 2, 3, 3, 4, 5, 5, 6]
-        re.resample(a,3) # [2, 4, 6]
+        re.resample(a,3) # [1, 3, 5]
 
         ```
     '''
@@ -132,12 +134,3 @@ class SystematicResampler(Resampler):
         for idx in sorted(add_idxs):
             tmp.append(slices[idx])
         return tmp
-
-        # d = int(len(slices)/threshold)
-        # tmp = []
-        # index = d
-        # while len(tmp) < threshold:
-        #     tmp.append(slices[index])
-        #     index += d
-        # return tmp
-
