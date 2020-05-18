@@ -40,10 +40,10 @@ dataloader:
     sample_train: 'default'
 dataset:
     batch_size: 8
-    dir: '/home/datasets/CCCCI_cleaned/dataset_cleaned'
+    dir: '/home/datasets/CCCCI_cleaned/dataset_seg'
     is_train: False
     name: 'CTDataset'
-    slice_num: 32
+    slice_num: 64
     test_list: './data/ct_test.json'
     train_list: './data/ct_train.json'
     valid_list: './data/ct_test.json'
@@ -66,7 +66,7 @@ hooks:
         setting: 2
         verbose: 1
 input:
-    size: (224, 224)
+    size: (128, 128)
 label_transforms:
     name: 'default'
 log:
