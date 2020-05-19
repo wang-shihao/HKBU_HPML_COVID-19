@@ -76,7 +76,11 @@ class _CTDataset(torch.utils.data.Dataset):
         return samples
 
     def preprocessing(self, img):
+<<<<<<< HEAD
+        resize = self.img_size[0] + 32
+=======
         resize = int(self.img_size[0]*5/4)
+>>>>>>> 949591ef5d9832d7b9135e48447013d32bed9760
         transform = TF.Compose([
             TF.Resize((resize, resize)),
             TF.CenterCrop(self.img_size),
@@ -98,7 +102,7 @@ class _CTDataset(torch.utils.data.Dataset):
             slice_path = os.path.join(path, slice_)
             img = self.loader(slice_path) # height * width * 3
             img = self.preprocessing(img)
-            slice_tensor.append(img)
+            slice_tensor.append(torch.unsqueeze(img[0, :, :]), 0)
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3)
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
