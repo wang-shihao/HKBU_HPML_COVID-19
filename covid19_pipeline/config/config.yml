@@ -1,5 +1,4 @@
 DEFAULT_CUDNN_BENCHMARK: True
-SEED: 42
 VERSION: 1
 abtfs:
     blur:
