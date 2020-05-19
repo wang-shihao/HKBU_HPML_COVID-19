@@ -13,7 +13,7 @@ class WideBottleneck(resnet.Bottleneck):
     expansion = 2
 
 
-def generate_model(model_depth, k, **kwargs):
+def generate_model(model_depth, k=2, **kwargs):
     assert model_depth in [50, 101, 152, 200]
 
     inplanes = [x * k for x in resnet.get_inplanes()]
@@ -31,4 +31,4 @@ def generate_model(model_depth, k, **kwargs):
 
 @META_ARCH_REGISTRY.register()
 def wide_resnet3d(cfg):
-    return generate_model(cfg)
+    return generate_model(cfg.model.model_depth, classes=cfg.model.classes)
