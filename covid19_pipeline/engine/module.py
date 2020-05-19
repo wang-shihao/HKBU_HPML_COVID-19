@@ -1,6 +1,6 @@
 
 from collections import OrderedDict
-
+from sklearn import metrics
 import torch
 
 from torchline.engine import MODULE_REGISTRY, DefaultModule, build_module
@@ -98,8 +98,8 @@ class CTModule(DefaultModule):
 
         if self.cfg.module.analyze_result:
             output.update({
-                'predictions': predictions.cpu().detach(),
-                'gt_labels': gt_labels.cpu().detach(),
+                'predictions': predictions.detach(),
+                'gt_labels': gt_labels.detach(),
             })
         # can also return just a scalar instead of a dict (return loss_val)
         return output
@@ -127,7 +127,7 @@ class CTModule(DefaultModule):
             gt_labels = torch.cat(gt_labels)
             analyze_result = self.analyze_result(gt_labels, predictions)
             self.log_info(analyze_result)
-            result.update({'analyze_result': analyze_result})
+            # result.update({'analyze_result': analyze_result})
         return result
 
     def test_step(self, batch, batch_idx):
@@ -142,4 +142,4 @@ class CTModule(DefaultModule):
             gt_lables: tensor (N)
             predictions: tensor (N*C)
         '''
-        return str(metrics.classification_report(gt_labels, predictions.argmax(1)))
+        return str(metrics.classification_report(gt_labels.cpu(), predictions.cpu().argmax(1)))
