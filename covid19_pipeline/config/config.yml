@@ -1,5 +1,4 @@
 DEFAULT_CUDNN_BENCHMARK: True
-SEED: 666
 VERSION: 1
 abtfs:
     blur:
@@ -40,10 +39,10 @@ dataloader:
     sample_train: 'default'
 dataset:
     batch_size: 8
-    dir: '/home/datasets/CCCCI_cleaned/dataset_cleaned'
+    dir: '/home/datasets/CCCCI_cleaned/dataset_seg'
     is_train: False
     name: 'CTDataset'
-    slice_num: 32
+    slice_num: 64
     test_list: './data/ct_test.json'
     train_list: './data/ct_train.json'
     valid_list: './data/ct_test.json'
@@ -66,7 +65,7 @@ hooks:
         setting: 2
         verbose: 1
 input:
-    size: (224, 224)
+    size: (128, 128)
 label_transforms:
     name: 'default'
 log:
@@ -83,11 +82,12 @@ loss:
 model:
     classes: 3
     finetune: False
-    name: 'densenet3d'
+    name: 'mc3_18'
     pretrained: False
-    model_depth: 121
+    model_depth: 101
 module:
     name: 'CTModule'
+    analyze_result: True
 optim:
     base_lr: 0.001
     momentum: 0.9

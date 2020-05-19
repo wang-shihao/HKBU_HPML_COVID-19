@@ -9,6 +9,8 @@
 - slice数量是64
 - tf表示数据增强操作，这里表示使用了flip
 
+运行命令: `srun --cpus-per-task 2 python main.py trainer.gpus [0,1] trainer.logger.test_tube.name densent3d121_datas_img128_bs8_s64 model.name densenet3d model.model_depth 121`
+
 # Exp1. 第一轮验证集上结果（测试不同模型）
 
 训练集的slice是随机采样，验证集是先将所有slice读取后使用Centercrop操作。图片大小均为224x224。
