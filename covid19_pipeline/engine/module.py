@@ -115,7 +115,9 @@ class CTModule(DefaultModule):
         # return torch.stack(outputs).mean()
 
         tqdm_dict = {key: val.avg for key, val in self.valid_meters.meters.items()}
-        result = {'progress_bar': tqdm_dict, 'log': tqdm_dict, 'valid_loss': self.valid_meters.meters['valid_loss'].avg}
+        result = {'progress_bar': tqdm_dict, 'log': tqdm_dict,
+                  'valid_loss': self.valid_meters.meters['valid_loss'].avg,
+                  'valid_acc_1': self.valid_meters.meters['valid_acc_1'].avg}
 
         if self.cfg.module.analyze_result:
             predictions = []
