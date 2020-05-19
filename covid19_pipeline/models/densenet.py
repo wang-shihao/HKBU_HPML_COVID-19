@@ -162,9 +162,13 @@ class DenseNet(nn.Module):
         return out
 
 
-def generate_model(model_depth, **kwargs):
+def generate_model(model_depth, n_input_channels, dropout, classes):
     assert model_depth in [121, 169, 201, 264]
-
+    kwargs = {
+        'n_input_channels': n_input_channels,
+        'drop_rate': dropout,
+        'classes': classes
+    }
     if model_depth == 121:
         model = DenseNet(num_init_features=64,
                          growth_rate=32,
@@ -190,4 +194,11 @@ def generate_model(model_depth, **kwargs):
 
 @META_ARCH_REGISTRY.register()
 def densenet3d(cfg):
-    return generate_model(cfg.model.model_depth, classes=cfg.model.classes)
+    model_depth = cfg.model.model_depth
+    n_input_channels = cfg.model.n_input_channels
+    classes = cfg.model.classes
+    dropout = cfg.model.dropout
+    return generate_model(model_depth,
+                          n_input_channels,
+                          dropout,
+                          classes)

@@ -16,6 +16,17 @@ class CTModule(DefaultModule):
         super(CTModule, self).__init__(cfg)
         h, w = self.cfg.input.size
         self.example_input_array = torch.rand(1, 3, 2, h, w)
+        self.crt_batch_idx = 0
+        self.inputs = self.example_input_array
+
+    def training_step_end(self, output):
+        self.print_log(self.trainer.batch_idx, True, self.inputs, self.train_meters)
+        return output
+
+    def validation_step_end(self, output):
+        self.crt_batch_idx += 1
+        self.print_log(self.crt_batch_idx, False, self.inputs, self.valid_meters)
+        return output
 
     def training_step(self, batch, batch_idx):
         """
@@ -26,6 +37,8 @@ class CTModule(DefaultModule):
         try:
             # forward pass
             inputs, gt_labels, paths = batch
+            self.crt_batch_idx = batch_idx
+            self.inputs = inputs
             predictions = self.forward(inputs)
 
             # calculate loss
@@ -54,7 +67,6 @@ class CTModule(DefaultModule):
             })
 
             self.train_meters.update({key: val.item() for key, val in tqdm_dict.items()})
-            self.print_log(batch_idx, True, inputs, self.train_meters)
 
             # can also return just a scalar instead of a dict (return loss_val)
             return output
@@ -70,6 +82,7 @@ class CTModule(DefaultModule):
         :return:
         """
         inputs, gt_labels, paths = batch
+        self.inputs = inputs
         predictions = self.forward(inputs)
 
         loss_val = self.loss(predictions, gt_labels)
@@ -88,13 +101,13 @@ class CTModule(DefaultModule):
             val_acc_k = val_acc_k.unsqueeze(0)
         
         output = OrderedDict({
-            'valid_loss': loss_val,
-            'valid_acc_1': val_acc_1,
+            'valid_loss': torch.tensor(loss_val),
+            'valid_acc_1': torch.tensor(val_acc_1),
             f'valid_acc_{self.cfg.topk[-1]}': val_acc_k,
         })
         tqdm_dict = {k: v for k, v in dict(output).items()}
         self.valid_meters.update({key: val.item() for key, val in tqdm_dict.items()})
-        self.print_log(batch_idx, False, inputs, self.valid_meters)
+        # self.print_log(batch_idx, False, inputs, self.valid_meters)
 
         if self.cfg.module.analyze_result:
             output.update({
@@ -114,10 +127,13 @@ class CTModule(DefaultModule):
         # we return just the average in this case (if we want)
         # return torch.stack(outputs).mean()
 
+        self.crt_batch_idx = 0
         tqdm_dict = {key: val.avg for key, val in self.valid_meters.meters.items()}
+        valid_loss = torch.tensor(self.valid_meters.meters['valid_loss'].avg)
+        valid_acc_1 = torch.tensor(self.valid_meters.meters['valid_acc_1'].avg)
         result = {'progress_bar': tqdm_dict, 'log': tqdm_dict,
-                  'valid_loss': self.valid_meters.meters['valid_loss'].avg,
-                  'valid_acc_1': self.valid_meters.meters['valid_acc_1'].avg}
+                  'valid_loss': valid_loss,
+                  'valid_acc_1': valid_acc_1}
 
         if self.cfg.module.analyze_result:
             predictions = []

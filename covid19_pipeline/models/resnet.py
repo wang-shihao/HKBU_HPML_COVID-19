@@ -217,9 +217,12 @@ class ResNet(nn.Module):
         return x
 
 
-def generate_model(model_depth, **kwargs):
+def generate_model(model_depth, n_input_channels, classes):
     assert model_depth in [10, 18, 34, 50, 101, 152, 200]
-
+    kwargs = {
+        'n_input_channels': n_input_channels,
+        'classes': classes
+    }
     if model_depth == 10:
         model = ResNet(BasicBlock, [1, 1, 1, 1], get_inplanes(), **kwargs)
     elif model_depth == 18:
@@ -239,4 +242,9 @@ def generate_model(model_depth, **kwargs):
 
 @META_ARCH_REGISTRY.register()
 def resnet3d(cfg):
-    return generate_model(cfg.model.model_depth,classes=cfg.model.classes)
+    model_depth = cfg.model.model_depth
+    n_input_channels = cfg.model.n_input_channels
+    classes = cfg.model.classes
+    return generate_model(model_depth,
+                          n_input_channels,
+                          classes)

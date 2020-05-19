@@ -9,9 +9,12 @@ def add_config(cfg):
     cfg.new_item = CN()
     '''
     cfg.dataset.slice_num = 64
+    cfg.dataset.is_color = True
     
     # model_depth
     cfg.model.model_depth = 121
+    cfg.model.n_input_channels = 3
+    cfg.model.dropout = 0
 
     ################################################################
     # ct transforms                                                #
