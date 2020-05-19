@@ -13,7 +13,7 @@ def add_config(cfg):
     
     # model_depth
     cfg.model.model_depth = 121
-    cfg.model.n_input_channels = 1
+    cfg.model.n_input_channels = 3
     cfg.model.dropout = 0
 
     ################################################################

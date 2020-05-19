@@ -166,7 +166,7 @@ def generate_model(model_depth, n_input_channels, dropout, classes):
     assert model_depth in [121, 169, 201, 264]
     kwargs = {
         'n_input_channels': n_input_channels,
-        'dropout': dropout,
+        'drop_rate': dropout,
         'classes': classes
     }
     if model_depth == 121:
