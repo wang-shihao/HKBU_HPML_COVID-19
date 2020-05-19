@@ -53,6 +53,14 @@ def generate_model(cfg, name):
     pretrained=cfg.model.pretrained
     classes = cfg.model.classes
     model = eval(f"models.video.{name}(pretrained={pretrained})")
+    if cfg.model.n_input_channels == 1:
+        model.stem[0].in_channels = 1
+        # reset weight
+        c_out = model.stem[0].out_channels
+        kernel_size = model.stem[0].kernel_size
+        model.stem[0].weight.data = torch.rand(c_out, 1, *kernel_size)
+        torch.nn.init.kaiming_normal_(model.stem[0].weight)
+    model.stem[0].kernel_size
     if classes != 1000:
         in_features = model.fc.in_features
         model.fc = nn.Linear(in_features, classes, bias=False)
