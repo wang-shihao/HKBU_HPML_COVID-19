@@ -1,8 +1,10 @@
 
 from collections import OrderedDict
+from sklearn import metrics
 import torch
-from torchline.engine import build_module, MODULE_REGISTRY, DefaultModule
-from torchline.utils import topk_acc, AverageMeterGroup
+
+from torchline.engine import MODULE_REGISTRY, DefaultModule, build_module
+from torchline.utils import AverageMeterGroup, topk_acc
 
 __all__ = [
     'CTModule'
@@ -94,10 +96,15 @@ class CTModule(DefaultModule):
         self.valid_meters.update({key: val.item() for key, val in tqdm_dict.items()})
         self.print_log(batch_idx, False, inputs, self.valid_meters)
 
+        if self.cfg.module.analyze_result:
+            output.update({
+                'predictions': predictions.detach(),
+                'gt_labels': gt_labels.detach(),
+            })
         # can also return just a scalar instead of a dict (return loss_val)
         return output
 
-    def validation_end(self, outputs):
+    def validation_epoch_end(self, outputs):
         """
         Called at the end of validation to aggregate outputs
         :param outputs: list of individual outputs of each validation step
@@ -109,4 +116,30 @@ class CTModule(DefaultModule):
 
         tqdm_dict = {key: val.avg for key, val in self.valid_meters.meters.items()}
         result = {'progress_bar': tqdm_dict, 'log': tqdm_dict, 'valid_loss': self.valid_meters.meters['valid_loss'].avg}
+
+        if self.cfg.module.analyze_result:
+            predictions = []
+            gt_labels = []
+            for output in outputs:
+                predictions.append(output['predictions'])
+                gt_labels.append(output['gt_labels'])
+            predictions = torch.cat(predictions)
+            gt_labels = torch.cat(gt_labels)
+            analyze_result = self.analyze_result(gt_labels, predictions)
+            self.log_info(analyze_result)
+            # result.update({'analyze_result': analyze_result})
         return result
+
+    def test_step(self, batch, batch_idx):
+        return self.validation_step(batch, batch_idx)
+
+    def test_epoch_end(self, outputs):
+        return self.validation_epoch_end(outputs)
+
+    def analyze_result(self, gt_labels, predictions):
+        '''
+        Args:
+            gt_lables: tensor (N)
+            predictions: tensor (N*C)
+        '''
+        return str(metrics.classification_report(gt_labels.cpu(), predictions.cpu().argmax(1)))

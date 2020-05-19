@@ -76,7 +76,11 @@ class _CTDataset(torch.utils.data.Dataset):
         return samples
 
     def preprocessing(self, img):
+<<<<<<< HEAD
         resize = self.img_size[0] + 32
+=======
+        resize = int(self.img_size[0]*5/4)
+>>>>>>> 949591ef5d9832d7b9135e48447013d32bed9760
         transform = TF.Compose([
             TF.Resize((resize, resize)),
             TF.CenterCrop(self.img_size),

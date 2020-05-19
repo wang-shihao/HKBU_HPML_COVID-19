@@ -18,7 +18,7 @@ class _FakeData(torch.utils.data.Dataset):
 
 
     def __getitem__(self, index):
-        return self.data[index], self.labels[index]
+        return self.data[index], self.labels[index], ''
 
     def __len__(self):
         return self.num
