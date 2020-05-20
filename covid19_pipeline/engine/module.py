@@ -1,7 +1,9 @@
-
+import os
 from collections import OrderedDict
-from sklearn import metrics
+
+import numpy as np
 import torch
+from sklearn import metrics
 
 from torchline.engine import MODULE_REGISTRY, DefaultModule, build_module
 from torchline.utils import AverageMeterGroup, topk_acc
@@ -145,14 +147,21 @@ class CTModule(DefaultModule):
             gt_labels = torch.cat(gt_labels)
             analyze_result = self.analyze_result(gt_labels, predictions)
             self.log_info(analyze_result)
-            # result.update({'analyze_result': analyze_result})
+            result.update({'analyze_result': analyze_result, 'predictions': predictions, 'gt_labels': gt_labels})
         return result
 
     def test_step(self, batch, batch_idx):
         return self.validation_step(batch, batch_idx)
 
     def test_epoch_end(self, outputs):
-        return self.validation_epoch_end(outputs)
+        result = self.validation_epoch_end(outputs)
+        predictions = result['predictions'].cpu().detach().numpy()
+        gt_labels = result['gt_labels'].cpu().detach().numpy()
+        path = self.cfg.log.path
+        np.save(os.path.join(path,'predictions.npy'), predictions)
+        np.save(os.path.join(path,'gt_labels.npy'), gt_labels)
+        result = {key:val for key, val in result.items() if key not in ['predictions', 'gt_labels']}
+        return result
 
     def analyze_result(self, gt_labels, predictions):
         '''
