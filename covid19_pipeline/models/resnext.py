@@ -84,4 +84,6 @@ def generate_model(model_depth, **kwargs):
 
 @META_ARCH_REGISTRY.register()
 def resnext3d(cfg):
-    return generate_model(cfg.model.model_depth, classes=cfg.model.classes, n_input_channels=cfg.model.n_input_channels)
+    return generate_model(cfg.model.model_depth,
+                          classes=cfg.model.classes,
+                          n_input_channels=cfg.model.n_input_channels)

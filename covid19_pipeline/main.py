@@ -20,8 +20,6 @@ import losses
 import data
 import engine
 
-from multiprocessing import Process
-import time
 
 def main(hparams):
     """
@@ -38,7 +36,6 @@ def main(hparams):
         trainer.test(model)
     else:
         model = build_module(cfg)
-        print(model)
         trainer = build_trainer(cfg, hparams)
         trainer.fit(model)
 
@@ -62,23 +59,6 @@ if __name__ == '__main__':
     hparams = parent_parser.parse_args()
     assert not (hparams.test_only and hparams.predict_only), "You can't set both 'test_only' and 'predict_only' True"
 
-    # ---------------------
-    # LOG NVIDIA-SMI
-    # ---------------------
-    #logfile = './nvidia-smi.log'
-    #class NVLogger(Process):
-    #    def __init__(self, logfile='./nvidia-smi.log', interval=10):
-    #        super().__init__()
-    #        self.logfile = logfile
-    #        self.interval = interval
-
-    #    def run(self):
-    #        while True:
-    #            os.system('nvidia-smi >> {}'.format(self.logfile))
-    #            time.sleep(self.interval)
-
-    #p = NVLogger()
-    #p.start()
     # ---------------------
     # RUN TRAINING
     # ---------------------
