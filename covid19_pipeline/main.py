@@ -65,20 +65,20 @@ if __name__ == '__main__':
     # ---------------------
     # LOG NVIDIA-SMI
     # ---------------------
-    logfile = './nvidia-smi.log'
-    class NVLogger(Process):
-        def __init__(self, logfile='./nvidia-smi.log', interval=1):
-            super().__init__()
-            self.logfile = logfile
-            self.interval = interval
+    #logfile = './nvidia-smi.log'
+    #class NVLogger(Process):
+    #    def __init__(self, logfile='./nvidia-smi.log', interval=10):
+    #        super().__init__()
+    #        self.logfile = logfile
+    #        self.interval = interval
 
-        def run(self):
-            while True:
-                os.system('nvidia-smi >> {}'.format(self.logfile))
-                time.sleep(self.interval)
+    #    def run(self):
+    #        while True:
+    #            os.system('nvidia-smi >> {}'.format(self.logfile))
+    #            time.sleep(self.interval)
 
-    p = NVLogger()
-    p.start()
+    #p = NVLogger()
+    #p.start()
     # ---------------------
     # RUN TRAINING
     # ---------------------
