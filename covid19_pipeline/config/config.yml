@@ -100,7 +100,7 @@ optim:
         patience: 10
         step_size: 10
         t_0: 5
-        t_max: 50
+        t_max: 100
         t_mul: 20
         verbose: True
     weight_decay: 0.0005
