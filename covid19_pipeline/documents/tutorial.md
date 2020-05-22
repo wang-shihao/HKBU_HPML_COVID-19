@@ -60,3 +60,34 @@ def add_config(cfg):
     ...
     return cfg
 ```
+
+# 保存测试集预测结果和ground truth
+
+假设你之前已经跑完的实验日志路径是`./outputs/A`,运行如下命令即可。 但是之前的tensorboard文件(A/version/tf)可能会被追加内容导致显示不正常，建议给tensorboard文件先弄一个备份。
+
+```bash
+srun python main.py --config_file ./outputs/A/version_0/config.yml --test_only trainer.resume_from_from_checkpoint ./outputs/A/version_0/checkpoints/epoch*.ckpt
+```
+
+运行完了之后会在`A/version`路径下生成`predictions.npy`(维度为798*3)和`gt_labels.npy`文件
+
+# 分析实验结果
+
+
+- 第一步需要将服务器上的日志信息导出，建议按照文件结构导出，例如：
+
+```
+exp1
+|_version_0
+    |_tf
+    |_metrics.csv
+    |_predictions.npy
+    |_gt_labels.npy
+exp2
+|_version_0
+...
+```
+
+- 第二步 生成confusion matrix, roc curve, classification_report等数据
+
+详见`results_analysis/visualize.ipynb`（可参考）
