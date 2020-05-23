@@ -10,6 +10,7 @@ def add_config(cfg):
     '''
     cfg.dataset.slice_num = 64
     cfg.dataset.is_color = True
+    cfg.dataset.is_3d = True
     
     # model_depth
     cfg.model.model_depth = 101
