@@ -17,11 +17,18 @@ x = torch.rand(1,16,64,64)
 
 cfg.model.n_input_channels = 16
 
-names = ['resnet2d', 'resnext2d', 'wide_resnet2d']
+names = [
+    # 'resnet2d', 'resnext2d', 'wide_resnet2d',
+    'densenet2d']
 depths = [18,34,50,101,152]
 for name in names:
     try:
-        if name != 'resnet2d': depths = [50,101]
+        if name == 'resnet2d':
+            depths = [18,34,50,101,152]
+        elif name == 'densenet2d':
+            depths = [121, 161, 201]
+        elif name in ['resnext2d', 'wide_resnet2d', ]:
+            depths = [50,101]
         cfg.model.name = name
         for d in depths:
             cfg.model.model_depth = d
