@@ -98,20 +98,24 @@ class _CTDataset(torch.utils.data.Dataset):
         path = sample['path']
         slice_tensor = []
 
+        # stack slice
         for slice_ in slices:
             slice_path = os.path.join(path, slice_)
             img = self.loader(slice_path) # height * width * 3
             img = self.preprocessing(img)
             if not self.is_color:
                 img = torch.unsqueeze(img[0, :, :], dim=0)
-            if not self.is_3d:
-                img = img[0, :, :]
             slice_tensor.append(img)
         slice_tensor = torch.stack(slice_tensor)
-        slice_tensor = slice_tensor.permute(1, 0, 2, 3)
+        slice_tensor = slice_tensor.permute(1, 0, 2, 3) # c*d*h*w
+
+        # transform
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
         slice_tensor = (slice_tensor-slice_tensor.mean())/(slice_tensor.std()+1e-5)
         if self.label_transforms: label = self.label_transforms.transform(label)
+
+        # if not 3d, then remove channel dimension
+        if not self.is_3d: slice_tensor = slice_tensor[0, :, :, :]
         return slice_tensor, label, sample['path']
 
     def __len__(self):
