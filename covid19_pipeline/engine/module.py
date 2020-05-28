@@ -177,4 +177,4 @@ class CTModule(DefaultModule):
             gt_lables: tensor (N)
             predictions: tensor (N*C)
         '''
-        return str(metrics.classification_report(gt_labels.cpu(), predictions.cpu().argmax(1)))
+        return str(metrics.classification_report(gt_labels.cpu(), predictions.cpu().argmax(1), digits=4))
