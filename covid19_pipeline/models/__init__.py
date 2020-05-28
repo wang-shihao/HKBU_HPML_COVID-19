@@ -6,3 +6,4 @@ from .wide_resnet import *
 from .pre_act_resnet import *
 from .resnet2d import *
 from .densenet2d import *
+from .fake_model import *

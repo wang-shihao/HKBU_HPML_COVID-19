@@ -8,6 +8,10 @@ def add_config(cfg):
     '''
     cfg.new_item = CN()
     '''
+    cfg.mixup = CN()
+    cfg.mixup.enable = 0
+    cfg.mixup.alpha = 0.4
+
     cfg.dataset.slice_num = 64
     cfg.dataset.is_color = True
     cfg.dataset.is_3d = True

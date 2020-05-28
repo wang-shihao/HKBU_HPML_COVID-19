@@ -80,6 +80,7 @@ srun python main.py --config_file ./outputs/A/version_0/config.yml --test_only t
 ```
 import os
 import glob
+import shutil
 
 tfs = glob.glob('./output/*/*/tf/*')
 ms = glob.glob('./output/*/*/metrics.csv')
