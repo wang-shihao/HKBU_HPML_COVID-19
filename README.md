@@ -1,16 +1,7 @@
 # HKBU_HPML_COVID-19
 
-## Citation
-Directory 3D-ResNet-PyTorch is derived from [https://github.com/kenshohara/3D-ResNets-PyTorch](https://github.com/kenshohara/3D-ResNets-PyTorch).
-
-Please cite the following:
-```bibtex
-@inproceedings{hara3dcnns,
-  author={Kensho Hara and Hirokatsu Kataoka and Yutaka Satoh},
-  title={Can Spatiotemporal 3D CNNs Retrace the History of 2D CNNs and ImageNet?},
-  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-  pages={6546--6555},
-  year={2018},
-}
-```
-
+## Link to Clean-CC-CCII
+FTP Server: http://47.92.107.188/Datasets/COVID-DATA-CT/
+Google Drive: https://drive.google.com/drive/folders/1qOWNdi5eRpuJClPimwIHvCV8z2RN7HQB?usp=sharing
+OneDrive: https://hkbuedu-my.sharepoint.com/:f:/g/personal/shwang_link_hkbu_edu_hk/EoieIbNgTjNGh0-sbsx3kj8BxzurNH994kwX2R6mjf3q1g?e=miYpfz
+Raw Data http://ncov-ai.big.ac.cn/download
