@@ -7,4 +7,4 @@ Google Drive: https://drive.google.com/drive/folders/1qOWNdi5eRpuJClPimwIHvCV8z2
 
 OneDrive: https://hkbuedu-my.sharepoint.com/:f:/g/personal/shwang_link_hkbu_edu_hk/EoieIbNgTjNGh0-sbsx3kj8BxzurNH994kwX2R6mjf3q1g?e=miYpfz
 
-Raw Data http://ncov-ai.big.ac.cn/download
+Raw Data (CC-CCII) http://ncov-ai.big.ac.cn/download
