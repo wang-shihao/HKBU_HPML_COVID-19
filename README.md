@@ -1,6 +1,6 @@
 # HKBU_HPML_COVID-19
 
-## Link to Clean-CC-CCII
+## Link to Clean-CC-CCII （Based on CC-CCII Ver. 1.0)
 FTP Server: http://47.92.107.188/Datasets/COVID-DATA-CT/
 
 Google Drive: https://drive.google.com/drive/folders/1qOWNdi5eRpuJClPimwIHvCV8z2RN7HQB?usp=sharing
