@@ -1,5 +1,21 @@
 # HKBU_HPML_COVID-19
 
+Citation
+```
+@article {He et al.benchmark,
+	author = {He, Xin and Wang, Shihao and Shi, Shaohuai and Chu, Xiaowen and Tang, Jiangping and Liu, Xin and Yan, Chenggang and Zhang, Jiyong and Ding, Guiguang},
+	title = {Benchmarking Deep Learning Models and Automated Model Design for COVID-19 Detection with Chest CT Scans},
+	elocation-id = {2020.06.08.20125963},
+	year = {2020},
+	doi = {10.1101/2020.06.08.20125963},
+	publisher = {Cold Spring Harbor Laboratory Press},
+	URL = {https://www.medrxiv.org/content/early/2020/06/09/2020.06.08.20125963},
+	eprint = {https://www.medrxiv.org/content/early/2020/06/09/2020.06.08.20125963.full.pdf},
+	journal = {medRxiv}
+}
+
+```
+
 ## 1. Link to Clean-CC-CCII (Based on CC-CCII Ver. 1.0)
 FTP Server: http://47.92.107.188/Datasets/COVID-DATA-CT/
 
@@ -8,6 +24,7 @@ Google Drive: https://drive.google.com/drive/folders/1qOWNdi5eRpuJClPimwIHvCV8z2
 OneDrive: https://hkbuedu-my.sharepoint.com/:f:/g/personal/shwang_link_hkbu_edu_hk/EoieIbNgTjNGh0-sbsx3kj8BxzurNH994kwX2R6mjf3q1g?e=miYpfz
 
 Raw Data (CC-CCII) http://ncov-ai.big.ac.cn/download
+
 
 ## 2. Experimental results
 
