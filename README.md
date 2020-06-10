@@ -1,7 +1,7 @@
 # HKBU_HPML_COVID-19
 
 Citation
-```
+```bib
 @article {He et al.benchmark,
 	author = {He, Xin and Wang, Shihao and Shi, Shaohuai and Chu, Xiaowen and Tang, Jiangping and Liu, Xin and Yan, Chenggang and Zhang, Jiyong and Ding, Guiguang},
 	title = {Benchmarking Deep Learning Models and Automated Model Design for COVID-19 Detection with Chest CT Scans},
