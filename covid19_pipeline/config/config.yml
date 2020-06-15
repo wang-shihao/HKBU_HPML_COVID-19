@@ -34,7 +34,7 @@ abtfs:
         scale_limit: 0.2
         shift_limit: 0.0625
 dataloader:
-    num_workers: 4
+    num_workers: 40
     sample_test: 'default'
     sample_train: 'default'
 dataset:

@@ -1,0 +1,1 @@
+srun -n 1 -s --cpus-per-task=40 python main.py --config_file ./config/config.yml trainer.gpus [0,1,2,3] model.name resnet3d model.model_depth 50 dataset.slice_num 64 dataset.batch_size 128 trainer.logger.test_tube.name resnet50_3d_1ch

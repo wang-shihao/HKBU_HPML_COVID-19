@@ -1,0 +1,1 @@
+srun -n 1 --cpus-per-task=40 python main.py --config_file ./config/config.yml trainer.gpus [0,1,2,3] model.name mc3_18 dataset.is_color True model.n_input_channels 3 dataset.slice_num 32 dataset.batch_size 128 trainer.logger.test_tube.name mc3_18_datas_bs64_s32
