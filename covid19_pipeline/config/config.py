@@ -8,8 +8,17 @@ def add_config(cfg):
     '''
     cfg.new_item = CN()
     '''
+    cfg.mixup = CN()
+    cfg.mixup.enable = 0
+    cfg.mixup.alpha = 0.4
+
     cfg.dataset.slice_num = 64
+<<<<<<< HEAD
     cfg.dataset.is_color = False
+=======
+    cfg.dataset.is_color = True
+    cfg.dataset.is_3d = True
+>>>>>>> 2ceba1297b9b893331b261ce9ffed72da4692139
     
     # model_depth
     cfg.model.model_depth = 101

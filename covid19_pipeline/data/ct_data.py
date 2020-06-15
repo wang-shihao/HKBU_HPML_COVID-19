@@ -22,6 +22,7 @@ def CTDataset(cfg):
     root_dir = cfg.dataset.dir
     is_train = cfg.dataset.is_train
     is_color = cfg.dataset.is_color
+    is_3d = cfg.dataset.is_3d
     if is_train:
         data_list = cfg.dataset.train_list
     else:
@@ -33,11 +34,11 @@ def CTDataset(cfg):
     img_size = cfg.input.size
     transforms = build_transforms(cfg)
     label_transforms = build_label_transforms(cfg)
-    return _CTDataset(root_dir, data_list, is_train, is_color, img_size, slice_num, loader,
+    return _CTDataset(root_dir, data_list, is_train, is_color, is_3d, img_size, slice_num, loader,
                     transforms, label_transforms)
 
 class _CTDataset(torch.utils.data.Dataset):
-    def __init__(self, root_dir, data_list, is_train, is_color=True, img_size=[224,224], slice_num=64, loader=pil_loader,
+    def __init__(self, root_dir, data_list, is_train, is_color=True, is_3d=True, img_size=[224,224], slice_num=64, loader=pil_loader,
                  transforms=None, label_transforms=None, *args, **kwargs):
         '''
         Args:
@@ -50,6 +51,7 @@ class _CTDataset(torch.utils.data.Dataset):
         self.data_list = data_list
         self.is_train = is_train
         self.is_color = is_color
+        self.is_3d = is_3d
         self.img_size = img_size
         self.slice_num = slice_num
         self.transforms = transforms
@@ -96,17 +98,24 @@ class _CTDataset(torch.utils.data.Dataset):
         path = sample['path']
         slice_tensor = []
 
+        # stack slice
         for slice_ in slices:
             slice_path = os.path.join(path, slice_)
             img = self.loader(slice_path) # height * width * 3
             img = self.preprocessing(img)
-            if not self.is_color: img = torch.unsqueeze(img[0, :, :], dim=0)
+            if not self.is_color:
+                img = torch.unsqueeze(img[0, :, :], dim=0)
             slice_tensor.append(img)
         slice_tensor = torch.stack(slice_tensor)
-        slice_tensor = slice_tensor.permute(1, 0, 2, 3)
+        slice_tensor = slice_tensor.permute(1, 0, 2, 3) # c*d*h*w
+
+        # transform
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
         slice_tensor = (slice_tensor-slice_tensor.mean())/(slice_tensor.std()+1e-5)
         if self.label_transforms: label = self.label_transforms.transform(label)
+
+        # if not 3d, then remove channel dimension
+        if not self.is_3d: slice_tensor = slice_tensor[0, :, :, :]
         return slice_tensor, label, sample['path']
 
     def __len__(self):

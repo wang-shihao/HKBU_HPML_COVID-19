@@ -8,6 +8,8 @@ from sklearn import metrics
 from torchline.engine import MODULE_REGISTRY, DefaultModule, build_module
 from torchline.utils import AverageMeterGroup, topk_acc
 
+from .utils import mixup_data, mixup_loss_fn
+
 __all__ = [
     'CTModule'
 ]
@@ -41,10 +43,16 @@ class CTModule(DefaultModule):
             inputs, gt_labels, paths = batch
             self.crt_batch_idx = batch_idx
             self.inputs = inputs
+            if self.cfg.mixup.enable:
+                inputs, gt_labels_a, gt_labels_b, lam = mixup_data(inputs, gt_labels, self.cfg.mixup.alpha)
+                mixup_y = [gt_labels_a, gt_labels_b, lam]
             predictions = self.forward(inputs)
 
             # calculate loss
-            loss_val = self.loss(predictions, gt_labels)
+            if self.cfg.mixup.enable:
+                loss_val = mixup_loss_fn(self.loss, predictions, *mixup_y)
+            else:
+                loss_val = self.loss(predictions, gt_labels)
 
             # acc
             acc_results = topk_acc(predictions, gt_labels, self.cfg.topk)
@@ -169,4 +177,4 @@ class CTModule(DefaultModule):
             gt_lables: tensor (N)
             predictions: tensor (N*C)
         '''
-        return str(metrics.classification_report(gt_labels.cpu(), predictions.cpu().argmax(1)))
+        return str(metrics.classification_report(gt_labels.cpu(), predictions.cpu().argmax(1), digits=4))
