@@ -1,6 +1,8 @@
 import json
 import os
 import random
+import nibabel
+import imageio
 
 import cv2
 import torch
@@ -99,6 +101,14 @@ class _CTDataset(torch.utils.data.Dataset):
         slice_tensor = []
 
         # stack slice
+        if slices[0].endswith('.nii') or slices[0].endswith('.nii.gz'):
+            slice_path = os.path.join(path, slices[0])
+            img = nib.load(img_path) 
+            img_fdata = img.get_fdata(dtype=np.uint8)
+            (x,y,z) = img.shape
+            slice_tensor = torch.IntTensor(img_fdata)
+            slice_tensor.unsqueeze(dim=0)
+
         for slice_ in slices:
             slice_path = os.path.join(path, slice_)
             img = self.loader(slice_path) # height * width * 3
