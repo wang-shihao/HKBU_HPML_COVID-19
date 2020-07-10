@@ -1,7 +1,19 @@
 # HKBU_HPML_COVID-19
 
+Source code of [**this paper**](https://www.medrxiv.org/content/10.1101/2020.06.08.20125963v2).
 
-## 1. Link to Clean-CC-CCII (based on CC-CCII ver. 1.0)
+Table of Contents
+=================
+
+   * [HKBU_HPML_COVID-19](#hkbu_hpml_covid-19)
+   * [1. Link to Clean-CC-CCII (based on CC-CCII ver. 1.0)](#1-link-to-clean-cc-ccii-based-on-cc-ccii-ver-10)
+   * [2. Experimental Results](#2-experimental-results)
+      * [2.1 Benchmark Deep Learning Models](#21-benchmark-deep-learning-models)
+      * [2.2 Automated Model Design](#22-automated-model-design)
+   * [3. Citation](#3-citation)
+
+
+# 1. Link to Clean-CC-CCII (based on CC-CCII ver. 1.0)
 FTP Server: http://47.92.107.188/Datasets/COVID-DATA-CT/
 
 Google Drive: https://drive.google.com/drive/folders/1qOWNdi5eRpuJClPimwIHvCV8z2RN7HQB?usp=sharing
@@ -11,9 +23,9 @@ OneDrive: https://hkbuedu-my.sharepoint.com/:f:/g/personal/shwang_link_hkbu_edu_
 Raw Data (CC-CCII) http://ncov-ai.big.ac.cn/download
 
 
-## 2. Experimental Results
+# 2. Experimental Results
 
-### 2.1 Benchmark Deep Learning Models
+## 2.1 Benchmark Deep Learning Models
 
 > If you want to run the benchmark experiments, you can refer to the directory of `covid19_pipeline`.
 
@@ -43,7 +55,7 @@ Raw Data (CC-CCII) http://ncov-ai.big.ac.cn/download
 ![model_mixup](./images/model_mixup.png)
 
 
-### 2.2 Automated Model Design
+## 2.2 Automated Model Design
 
 > The code of NAS will be released very soon ...
 
@@ -61,7 +73,7 @@ Raw Data (CC-CCII) http://ncov-ai.big.ac.cn/download
 ![nas_vs_manual](./images/nas_vs_manual.png)
 
 
-## 3. Citation
+# 3. Citation
 
 [Benchmarking Deep Learning Models and Automated Model Design for COVID-19 Detection with Chest CT Scans](https://www.medrxiv.org/content/10.1101/2020.06.08.20125963v1)
 

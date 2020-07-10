@@ -61,12 +61,12 @@ class RandomResampler(Resampler):
             tmp.pop(idx)
         return tmp
 
-class SystematicResampler(Resampler):
+class SymmetricalResampler(Resampler):
     '''
     Examples:
         ```
         a = list(range(7))
-        re = SystematicResampler()
+        re = SymmetricalResampler()
         re.resample(a,15) # [0, 0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 5, 5, 6, 6]
         re.resample(a,10) # [0, 1, 1, 2, 3, 3, 4, 5, 5, 6]
         re.resample(a,3) # [1, 3, 5]
@@ -134,3 +134,10 @@ class SystematicResampler(Resampler):
         for idx in sorted(add_idxs):
             tmp.append(slices[idx])
         return tmp
+
+if __name__ == '__main__':
+    sampler = SymmetricalResampler()
+    a = [0,1,2,3]
+    print(sampler.resample(a, 10))
+    a = [0,1,2,3,4]
+    print(sampler.resample(a, 10))
