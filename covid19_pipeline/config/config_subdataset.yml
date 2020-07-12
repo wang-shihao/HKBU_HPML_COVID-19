@@ -41,6 +41,8 @@ dataset:
     batch_size: 64
     dir: '/home/datasets/CCCCI_cleaned/dataset_seg'
     is_train: False
+    is_3d: True
+    is_color: False
     name: 'CTDataset'
     slice_num: 16
     test_list: './data/ct_sub_test.json'
@@ -84,6 +86,7 @@ model:
     finetune: False
     name: 'mc3_18'
     pretrained: False
+    n_input_channels: 1
     model_depth: 101
 module:
     name: 'CTModule'

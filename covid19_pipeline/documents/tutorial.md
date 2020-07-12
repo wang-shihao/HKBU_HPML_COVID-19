@@ -66,7 +66,7 @@ def add_config(cfg):
 假设你之前已经跑完的实验日志路径是`./outputs/A`,运行如下命令即可。 但是之前的tensorboard文件(A/version/tf)可能会被追加内容导致显示不正常，建议给tensorboard文件先弄一个备份。
 
 ```bash
-srun python main.py --config_file ./outputs/A/version_0/config.yml --test_only trainer.gpus [0] trainer.resume_from_from_checkpoint ./outputs/A/version_0/checkpoints/epoch*.ckpt
+srun python main.py --config_file ./outputs/A/version_0/config.yml --test_only trainer.gpus [0] trainer.resume_from_checkpoint ./outputs/A/version_0/checkpoints/epoch*.ckpt
 ```
 
 运行完了之后会在`A/version`路径下生成`predictions.npy`(维度为798*3)和`gt_labels.npy`文件

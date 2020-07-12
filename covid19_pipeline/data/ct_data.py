@@ -101,7 +101,7 @@ class _CTDataset(torch.utils.data.Dataset):
     def get_nifti(self, sample):
         path = sample['path']
         slice_tensor = []
-        slice_path = os.path.join(path, sample['slices'][0])
+        slice_path = path
         img = nib.load(slice_path) 
         img_fdata = img.get_fdata()
         (x,y,z) = img.shape
@@ -113,7 +113,11 @@ class _CTDataset(torch.utils.data.Dataset):
         else:
             slices = SymmetricalResampler.resample(list(range(z)), self.slice_num)
         slice_tensor = slice_tensor[:, slices, :, :]
-        # print(slice_tensor.size())
+        # todo: imbalanced problem
+        h, w = self.img_size[0], self.img_size[1]
+        size = (h*5//4, w*5//4)
+        slice_tensor = torch.nn.functional.interpolate(slice_tensor, size) # resize
+        slice_tensor = slice_tensor[:, :, size[0]-h//2:size[0]+h//2, size[1]-w//2:size[1]+w//2] # centercrop
 
         return slice_tensor
 
