@@ -91,7 +91,7 @@ class _CTDataset(torch.utils.data.Dataset):
         ])
         return transform(img)
 
-    def get_nifti(self, slices, sample):
+    def get_nifti(self, sample):
         path = sample['path']
         slice_tensor = []
         slice_path = os.path.join(path, slices[0])
@@ -110,7 +110,7 @@ class _CTDataset(torch.utils.data.Dataset):
 
         return slice_tensor
 
-    def get_png(self, slices, sample):
+    def get_png(self, sample):
         path = sample['path']
         if self.is_train:
             slices = RandomResampler.resample(sample['slices'], self.slice_num)
@@ -134,10 +134,11 @@ class _CTDataset(torch.utils.data.Dataset):
         sample = self.samples[idx]
         label = torch.tensor(sample['label']).long()
         # stack & sample slice
+        print('1\n' * 5)
         if sample['slices'][0].endswith('.nii') or sample['slices'][0].endswith('.nii.gz'):
-            slice_tensor = get_nifti(slices, sample)
+            slice_tensor = self.get_nifti(sample)
         else:
-            slice_tensor = get_png(slices, sample)
+            slice_tensor = self.get_png(sample)
 
         # transform
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
