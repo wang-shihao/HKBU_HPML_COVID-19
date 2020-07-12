@@ -180,7 +180,7 @@ class CTModule(DefaultModule):
         '''
         cls_report = str(imblearn.metrics.classification_report_imbalanced(gt_labels.cpu(), predictions.cpu().argmax(1), digits=4))
         covid_auc = 0
-        gt_onehot = np.eye(3)[gt_labels]
-        fpr,tpr,_ = metrics.roc_curve(gt_onehot[:,1],pred[:,1])
+        gt_onehot = np.eye(len(gt_labels))[gt_labels.cpu()]
+        fpr,tpr,_ = metrics.roc_curve(gt_onehot[:,1],predictions.cpu()[:,1])
         covid_auc = metrics.auc(fpr, tpr)
-        return f"{cls_report}\nCovid class AUC={covid_auc}"
+        return f"\n{cls_report}\nCovid class AUC={covid_auc}"

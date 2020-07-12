@@ -1,7 +1,7 @@
 import json
 import os
 import random
-import nibabel
+import nibabel as nib
 import imageio
 
 import cv2
@@ -79,7 +79,10 @@ class _CTDataset(torch.utils.data.Dataset):
                 for scan_id in data[cls_][pid]:
                     slices = data[cls_][pid][scan_id]
                     label = self.cls_to_label[cls_]
-                    scan_path = os.path.join(self.root_dir,cls_,pid,scan_id)
+                    if cls_.startswith('CT-'):
+                        scan_path = os.path.join(self.root_dir,cls_,slices[0])
+                    else:
+                        scan_path = os.path.join(self.root_dir,cls_,pid,scan_id)
                     if os.path.exists(scan_path):
                         if len(slices)>0:
                             samples[idx] = {'slices':slices, 'label': label, 'path': scan_path}
@@ -98,19 +101,19 @@ class _CTDataset(torch.utils.data.Dataset):
     def get_nifti(self, sample):
         path = sample['path']
         slice_tensor = []
-        slice_path = os.path.join(path, slices[0])
+        slice_path = os.path.join(path, sample['slices'][0])
         img = nib.load(slice_path) 
         img_fdata = img.get_fdata()
         (x,y,z) = img.shape
         slice_tensor = torch.FloatTensor(img_fdata)
-        slice_tensor.unsqueeze(dim=0)
-        slice_tessor = slice_tensor.permute(0, 3, 1, 2)
+        slice_tensor = slice_tensor.unsqueeze(dim=0)
+        slice_tensor = slice_tensor.permute(0, 3, 1, 2)
         if self.is_train:
             slices = RandomResampler.resample(list(range(z)), self.slice_num)
         else:
             slices = SymmetricalResampler.resample(list(range(z)), self.slice_num)
         slice_tensor = slice_tensor[:, slices, :, :]
-        print(slice_tensor.size())
+        # print(slice_tensor.size())
 
         return slice_tensor
 
