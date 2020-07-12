@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 import numpy as np
 import torch
+import imblearn
 from sklearn import metrics
 
 from torchline.engine import MODULE_REGISTRY, DefaultModule, build_module
@@ -177,4 +178,9 @@ class CTModule(DefaultModule):
             gt_lables: tensor (N)
             predictions: tensor (N*C)
         '''
-        return str(metrics.classification_report(gt_labels.cpu(), predictions.cpu().argmax(1), digits=4))
+        cls_report = str(imblearn.metrics.classification_report_imbalanced(gt_labels.cpu(), predictions.cpu().argmax(1), digits=4))
+        covid_auc = 0
+        gt_onehot = np.eye(len(gt_labels))[gt_labels.cpu()]
+        fpr,tpr,_ = metrics.roc_curve(gt_onehot[:,1],predictions.cpu()[:,1])
+        covid_auc = metrics.auc(fpr, tpr)
+        return f"\n{cls_report}\nCovid class AUC={covid_auc}"
