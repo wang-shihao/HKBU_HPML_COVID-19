@@ -63,8 +63,12 @@ class _CTDataset(torch.utils.data.Dataset):
         self.kwargs = kwargs
         with open(self.data_list, 'r') as f:
             self.data = json.load(f)
-        self.cls_to_label = {'CP': 0, 'NCP': 1, 'Normal': 2, 'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1} 
-        #{key:idx for idx, key in enumerate(self.data)} 
+        self.cls_to_label = {
+            # png slices
+            'CP': 0, 'NCP': 1, 'Normal': 2,
+            # nni
+            'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1
+        } 
         self.samples = self.convert_json_to_list(self.data)
 
     def convert_json_to_list(self, data):
@@ -91,7 +95,7 @@ class _CTDataset(torch.utils.data.Dataset):
         ])
         return transform(img)
 
-    def get_nifti(self, slices, sample):
+    def get_nifti(self, sample):
         path = sample['path']
         slice_tensor = []
         slice_path = os.path.join(path, slices[0])
@@ -102,15 +106,15 @@ class _CTDataset(torch.utils.data.Dataset):
         slice_tensor.unsqueeze(dim=0)
         slice_tessor = slice_tensor.permute(0, 3, 1, 2)
         if self.is_train:
-            slices = RandomResampler.resample(range(z), self.slice_num)
+            slices = RandomResampler.resample(list(range(z)), self.slice_num)
         else:
-            slices = SymmetricalResampler.resample(range(z), self.slice_num)
+            slices = SymmetricalResampler.resample(list(range(z)), self.slice_num)
         slice_tensor = slice_tensor[:, slices, :, :]
         print(slice_tensor.size())
 
         return slice_tensor
 
-    def get_png(self, slices, sample):
+    def get_png(self, sample):
         path = sample['path']
         if self.is_train:
             slices = RandomResampler.resample(sample['slices'], self.slice_num)
@@ -135,9 +139,9 @@ class _CTDataset(torch.utils.data.Dataset):
         label = torch.tensor(sample['label']).long()
         # stack & sample slice
         if sample['slices'][0].endswith('.nii') or sample['slices'][0].endswith('.nii.gz'):
-            slice_tensor = get_nifti(slices, sample)
+            slice_tensor = self.get_nifti(sample)
         else:
-            slice_tensor = get_png(slices, sample)
+            slice_tensor = self.get_png(sample)
 
         # transform
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
