@@ -6,8 +6,15 @@ root_dir = '/home/datasets/MosMedData/COVID19_1110/studies'
 train = {}
 test = {}
 for cls in os.listdir(root_dir):
+#for label in os.listdir(root_dir):
+#    if label == 'CT-0':
+#        cls = 'Normal'
+#    else:
+#        cls = 'NCP'
     if cls.startswith('.'):
+    #if label.startswith('.'):
         continue
+    #cls_dir = os.path.join(root_dir, label)
     cls_dir = os.path.join(root_dir, cls)
     train[cls] = {}
     test[cls] = {}

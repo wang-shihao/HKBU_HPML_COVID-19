@@ -63,7 +63,8 @@ class _CTDataset(torch.utils.data.Dataset):
         self.kwargs = kwargs
         with open(self.data_list, 'r') as f:
             self.data = json.load(f)
-        self.cls_to_label = {key:idx for idx, key in enumerate(self.data)} # {'CP': 0, 'NCP': 1, 'Normal': 2}
+        self.cls_to_label = {'CP': 0, 'NCP': 1, 'Normal': 2, 'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1} 
+        #{key:idx for idx, key in enumerate(self.data)} 
         self.samples = self.convert_json_to_list(self.data)
 
     def convert_json_to_list(self, data):
@@ -90,19 +91,32 @@ class _CTDataset(torch.utils.data.Dataset):
         ])
         return transform(img)
 
-    def get_nifti(path, slices):
+    def get_nifti(self, slices, sample):
+        path = sample['path']
         slice_tensor = []
         slice_path = os.path.join(path, slices[0])
         img = nib.load(slice_path) 
         img_fdata = img.get_fdata()
         (x,y,z) = img.shape
-        slice_tensor = torch.IntTensor(img_fdata)
+        slice_tensor = torch.FloatTensor(img_fdata)
         slice_tensor.unsqueeze(dim=0)
+        slice_tessor = slice_tensor.permute(0, 3, 1, 2)
+        if self.is_train:
+            slices = RandomResampler.resample(range(z), self.slice_num)
+        else:
+            slices = SymmetricalResampler.resample(range(z), self.slice_num)
+        slice_tensor = slice_tensor[:, slices, :, :]
         print(slice_tensor.size())
 
         return slice_tensor
 
-    def get_png(path, slices):
+    def get_png(self, slices, sample):
+        path = sample['path']
+        if self.is_train:
+            slices = RandomResampler.resample(sample['slices'], self.slice_num)
+        else:
+            slices = SymmetricalResampler.resample(sample['slices'], self.slice_num)
+        
         slice_tensor = []
         for slice_ in slices:
             slice_path = os.path.join(path, slice_)
@@ -119,19 +133,11 @@ class _CTDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         sample = self.samples[idx]
         label = torch.tensor(sample['label']).long()
-        if self.is_train:
-            slices = RandomResampler.resample(sample['slices'], self.slice_num)
+        # stack & sample slice
+        if sample['slices'][0].endswith('.nii') or sample['slices'][0].endswith('.nii.gz'):
+            slice_tensor = get_nifti(slices, sample)
         else:
-            slices = SymmetricalResampler.resample(sample['slices'], self.slice_num)
-        path = sample['path']
-
-        # stack slice
-        if slices[0].endswith('.nii') or slices[0].endswith('.nii.gz'):
-            slice_tensor = get_nifti()
-        else:
-            slice_tensor = get_png()
-        print(slice_tensor)
-        print("#"*30)
+            slice_tensor = get_png(slices, sample)
 
         # transform
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
