@@ -1,8 +1,6 @@
 import json
 import os
 import random
-import nibabel
-import imageio
 
 import cv2
 import torch
@@ -10,7 +8,7 @@ import torchvision.transforms as TF
 from torchline.data import (DATASET_REGISTRY, build_label_transforms,
                             build_transforms)
 
-from .utils import SymmetricalResampler, RandomResampler, pil_loader
+from .utils import SystematicResampler, RandomResampler, pil_loader
 
 
 __all__ = [
@@ -96,19 +94,11 @@ class _CTDataset(torch.utils.data.Dataset):
         if self.is_train:
             slices = RandomResampler.resample(sample['slices'], self.slice_num)
         else:
-            slices = SymmetricalResampler.resample(sample['slices'], self.slice_num)
+            slices = SystematicResampler.resample(sample['slices'], self.slice_num)
         path = sample['path']
         slice_tensor = []
 
         # stack slice
-        if slices[0].endswith('.nii') or slices[0].endswith('.nii.gz'):
-            slice_path = os.path.join(path, slices[0])
-            img = nib.load(img_path) 
-            img_fdata = img.get_fdata()
-            (x,y,z) = img.shape
-            slice_tensor = torch.IntTensor(img_fdata)
-            slice_tensor.unsqueeze(dim=0)
-
         for slice_ in slices:
             slice_path = os.path.join(path, slice_)
             img = self.loader(slice_path) # height * width * 3
@@ -118,8 +108,6 @@ class _CTDataset(torch.utils.data.Dataset):
             slice_tensor.append(img)
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3) # c*d*h*w
-        print(slice_tensor)
-        print("#"*30)
 
         # transform
         if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
