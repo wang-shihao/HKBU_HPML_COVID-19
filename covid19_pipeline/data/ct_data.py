@@ -90,25 +90,20 @@ class _CTDataset(torch.utils.data.Dataset):
         ])
         return transform(img)
 
-    def __getitem__(self, idx):
-        sample = self.samples[idx]
-        label = torch.tensor(sample['label']).long()
-        if self.is_train:
-            slices = RandomResampler.resample(sample['slices'], self.slice_num)
-        else:
-            slices = SymmetricalResampler.resample(sample['slices'], self.slice_num)
-        path = sample['path']
+    def get_nifti(path, slices):
         slice_tensor = []
+        slice_path = os.path.join(path, slices[0])
+        img = nib.load(slice_path) 
+        img_fdata = img.get_fdata()
+        (x,y,z) = img.shape
+        slice_tensor = torch.IntTensor(img_fdata)
+        slice_tensor.unsqueeze(dim=0)
+        print(slice_tensor.size())
 
-        # stack slice
-        if slices[0].endswith('.nii') or slices[0].endswith('.nii.gz'):
-            slice_path = os.path.join(path, slices[0])
-            img = nib.load(img_path) 
-            img_fdata = img.get_fdata()
-            (x,y,z) = img.shape
-            slice_tensor = torch.IntTensor(img_fdata)
-            slice_tensor.unsqueeze(dim=0)
+        return slice_tensor
 
+    def get_png(path, slices):
+        slice_tensor = []
         for slice_ in slices:
             slice_path = os.path.join(path, slice_)
             img = self.loader(slice_path) # height * width * 3
@@ -118,6 +113,23 @@ class _CTDataset(torch.utils.data.Dataset):
             slice_tensor.append(img)
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3) # c*d*h*w
+        
+        return slice_tensor
+
+    def __getitem__(self, idx):
+        sample = self.samples[idx]
+        label = torch.tensor(sample['label']).long()
+        if self.is_train:
+            slices = RandomResampler.resample(sample['slices'], self.slice_num)
+        else:
+            slices = SymmetricalResampler.resample(sample['slices'], self.slice_num)
+        path = sample['path']
+
+        # stack slice
+        if slices[0].endswith('.nii') or slices[0].endswith('.nii.gz'):
+            slice_tensor = get_nifti()
+        else:
+            slice_tensor = get_png()
         print(slice_tensor)
         print("#"*30)
 
