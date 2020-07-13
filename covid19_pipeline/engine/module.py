@@ -183,4 +183,5 @@ class CTModule(DefaultModule):
         gt_onehot = np.eye(len(gt_labels))[gt_labels.cpu()]
         fpr,tpr,_ = metrics.roc_curve(gt_onehot[:,1],predictions.cpu()[:,1])
         covid_auc = metrics.auc(fpr, tpr)
-        return f"\n{cls_report}\nCovid class AUC={covid_auc}"
+        acc = metrics.accuracy_score(gt_labels.cpu(), predictions.cpu().argmax(1))
+        return f"\n{cls_report}\nCovid class AUC={covid_auc}\nACC={acc}"
