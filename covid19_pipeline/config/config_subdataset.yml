@@ -45,9 +45,9 @@ dataset:
     is_color: False
     name: 'CTDataset'
     slice_num: 16
-    test_list: './data/ct_sub_test.json'
+    test_list: './data/ct_test.json'
     train_list: './data/ct_sub_train.json'
-    valid_list: './data/ct_sub_test.json'
+    valid_list: './data/ct_test.json'
 hooks:
     early_stopping:
         min_delta: 0.0
