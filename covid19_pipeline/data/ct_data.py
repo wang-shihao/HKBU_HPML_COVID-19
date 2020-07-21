@@ -49,7 +49,7 @@ class _CTDataset(torch.utils.data.Dataset):
             is_train: determine to load which type of dataset
             slice_num: the number of slices in a scan
         '''
-        balanced = True
+        balanced = False
         self.root_dir = root_dir
         self.data_list = data_list
         self.is_train = is_train
