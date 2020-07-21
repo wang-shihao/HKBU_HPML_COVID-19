@@ -49,6 +49,7 @@ class _CTDataset(torch.utils.data.Dataset):
             is_train: determine to load which type of dataset
             slice_num: the number of slices in a scan
         '''
+        balanced = True
         self.root_dir = root_dir
         self.data_list = data_list
         self.is_train = is_train
@@ -70,6 +71,45 @@ class _CTDataset(torch.utils.data.Dataset):
             'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1
         } 
         self.samples = self.convert_json_to_list(self.data)
+        if balanced:
+            self.samples = self.balance_samples(self.samples, self.cls_to_label)
+        print(self.samples)
+
+    def balance_samples(self, samples, cls_to_label):
+        print("Start balance sampling")
+        all_labels = set()
+        label_counts = {}
+        for sample, value in samples.items():
+            all_labels.add(value['label'])
+
+        for label in all_labels:
+            label_counts[label] = 0
+
+        for sample, value in samples.items():
+            label_counts[value['label']] += 1
+
+        # min_count = min(label_counts)
+        min_count = min(list(label_counts.values()))
+        # print(label_counts)
+        print("Min count is {}".format(min_count))
+        already_choosen = set()
+        new_samples = {}
+
+        new_index = 0
+        for label in all_labels:
+            count = 0
+            while count < min_count:
+                asample = random.choice(list(samples.keys()))
+                index = samples[asample]['label']
+                if index == label and index not in already_choosen:
+                    count += 1
+                    already_choosen.add(index)
+                    new_samples[new_index] = samples[index]
+                    new_index += 1
+
+        print("End balance sampling")
+        return new_samples
+
 
     def convert_json_to_list(self, data):
         samples = {} # {0: {'scans': [], 'labels': 0}}
@@ -145,7 +185,7 @@ class _CTDataset(torch.utils.data.Dataset):
         sample = self.samples[idx]
         label = torch.tensor(sample['label']).long()
         # stack & sample slice
-        print('1\n' * 5)
+        #print('1\n' * 5)
         if sample['slices'][0].endswith('.nii') or sample['slices'][0].endswith('.nii.gz'):
             slice_tensor = self.get_nifti(sample)
         else:

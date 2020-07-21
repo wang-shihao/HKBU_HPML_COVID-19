@@ -5,6 +5,7 @@ import random
 root_dir = '/home/datasets/MosMedData/COVID19_1110/studies'
 train = {}
 test = {}
+
 for cls in os.listdir(root_dir):
 #for label in os.listdir(root_dir):
 #    if label == 'CT-0':
@@ -26,6 +27,7 @@ for cls in os.listdir(root_dir):
         train_set.add(random.choice(list(all_imgs)))
 
     test_set = all_imgs - train_set
+
     for name in train_set:
         pid = name.split('.nii')[0].split('_')[1]
         train[cls][pid] = {}
