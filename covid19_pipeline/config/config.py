@@ -17,8 +17,8 @@ def add_config(cfg):
     cfg.dataset.is_3d = True
 
     cfg.dataloader.sampler = CN()
-    cfg.dataloader.sampler.weights = [1, 1, 1] # the weight for each class
-    cfg.dataloader.sampler.num_samples = len(cfg.dataloader.sampler.weights)
+    cfg.dataloader.sampler.weights = [0, 0.23, 0.77] # the weight for each class
+    cfg.dataloader.sampler.num_samples = 1110
     cfg.dataloader.sampler.replacement = True
 
     # model_depth
