@@ -73,7 +73,7 @@ class _CTDataset(torch.utils.data.Dataset):
         self.samples = self.convert_json_to_list(self.data)
         if balanced:
             self.samples = self.balance_samples(self.samples, self.cls_to_label)
-        print(self.samples)
+        # print(self.samples)
 
     def balance_samples(self, samples, cls_to_label):
         print("Start balance sampling")
@@ -119,7 +119,7 @@ class _CTDataset(torch.utils.data.Dataset):
                 for scan_id in data[cls_][pid]:
                     slices = data[cls_][pid][scan_id]
                     label = self.cls_to_label[cls_]
-                    if cls_.startswith('CT-'):
+                    if slices[0].endswith('.nii') or slices[0].endswith('.gz'):
                         scan_path = os.path.join(self.root_dir,cls_,slices[0])
                     else:
                         scan_path = os.path.join(self.root_dir,cls_,pid,scan_id)
