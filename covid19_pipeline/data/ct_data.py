@@ -25,10 +25,13 @@ def CTDataset(cfg):
     is_train = cfg.dataset.is_train
     is_color = cfg.dataset.is_color
     is_3d = cfg.dataset.is_3d
+    data_percent = 1.0
     if is_train:
         data_list = cfg.dataset.train_list
+        data_percent = cfg.dataset.subset_train
     else:
         data_list = cfg.dataset.test_list
+        data_percent = cfg.dataset.subset_valid
     if 'Albumentation' in cfg.transforms.name:
         loader = cv2.imread
     else:
@@ -36,12 +39,12 @@ def CTDataset(cfg):
     img_size = cfg.input.size
     transforms = build_transforms(cfg)
     label_transforms = build_label_transforms(cfg)
-    return _CTDataset(root_dir, data_list, is_train, is_color, is_3d, img_size, slice_num, loader,
+    return _CTDataset(root_dir, data_list, is_train, is_color, is_3d, img_size, slice_num, data_percent, loader,
                     transforms, label_transforms)
 
 class _CTDataset(torch.utils.data.Dataset):
-    def __init__(self, root_dir, data_list, is_train, is_color=True, is_3d=True, img_size=[224,224], slice_num=64, loader=pil_loader,
-                 transforms=None, label_transforms=None, *args, **kwargs):
+    def __init__(self, root_dir, data_list, is_train, is_color=True, is_3d=True, img_size=[224,224], slice_num=64, data_percent=1.0,
+                 loader=pil_loader, transforms=None, label_transforms=None, *args, **kwargs):
         '''
         Args:
             root_dir: root dir of dataset, e.g., ~/../../datasets/CCCCI_cleaned/dataset_cleaned/
@@ -49,7 +52,7 @@ class _CTDataset(torch.utils.data.Dataset):
             is_train: determine to load which type of dataset
             slice_num: the number of slices in a scan
         '''
-        balanced = False
+
         self.root_dir = root_dir
         self.data_list = data_list
         self.is_train = is_train
@@ -57,6 +60,7 @@ class _CTDataset(torch.utils.data.Dataset):
         self.is_3d = is_3d
         self.img_size = img_size
         self.slice_num = slice_num
+        self.data_percent = data_percent
         self.transforms = transforms
         self.label_transforms = label_transforms
         self.loader = loader
@@ -70,51 +74,21 @@ class _CTDataset(torch.utils.data.Dataset):
             # nni
             'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1
         } 
+        self.cls_scan_num = {} # e.g. {'CP': 1210, 'NCP': 1213, 'Normal': 772}
+        self.cls_patietn_num = {} # e.g. {'CP': 778, 'NCP': 726, 'Normal': 660}
+        for cls_ in self.data:
+            self.cls_patietn_num[cls_] = len(self.data[cls_])
+            self.cls_scan_num[cls_] = 0
+            for pid in self.data[cls_]:
+                self.cls_scan_num[cls_] += len(self.data[cls_][pid])
         self.samples = self.convert_json_to_list(self.data)
-        if balanced:
-            self.samples = self.balance_samples(self.samples, self.cls_to_label)
-        # print(self.samples)
-
-    def balance_samples(self, samples, cls_to_label):
-        print("Start balance sampling")
-        all_labels = set()
-        label_counts = {}
-        for sample, value in samples.items():
-            all_labels.add(value['label'])
-
-        for label in all_labels:
-            label_counts[label] = 0
-
-        for sample, value in samples.items():
-            label_counts[value['label']] += 1
-
-        # min_count = min(label_counts)
-        min_count = min(list(label_counts.values()))
-        # print(label_counts)
-        print("Min count is {}".format(min_count))
-        already_choosen = set()
-        new_samples = {}
-
-        new_index = 0
-        for label in all_labels:
-            count = 0
-            while count < min_count:
-                asample = random.choice(list(samples.keys()))
-                index = samples[asample]['label']
-                if index == label and index not in already_choosen:
-                    count += 1
-                    already_choosen.add(index)
-                    new_samples[new_index] = samples[index]
-                    new_index += 1
-
-        print("End balance sampling")
-        return new_samples
-
 
     def convert_json_to_list(self, data):
         samples = {} # {0: {'scans': [], 'labels': 0}}
         idx = 0
         for cls_ in data:
+            count = 0
+            total = self.cls_scan_num[cls_]
             for pid in data[cls_]:
                 for scan_id in data[cls_][pid]:
                     slices = data[cls_][pid][scan_id]
@@ -123,10 +97,12 @@ class _CTDataset(torch.utils.data.Dataset):
                         scan_path = os.path.join(self.root_dir,cls_,slices[0])
                     else:
                         scan_path = os.path.join(self.root_dir,cls_,pid,scan_id)
-                    if os.path.exists(scan_path):
-                        if len(slices)>0:
+                    if os.path.exists(scan_path) and len(slices)>0:
                             samples[idx] = {'slices':slices, 'label': label, 'path': scan_path}
                             idx += 1
+                            count += 1
+                if self.data_percent < 1 and count >= total*self.data_percent:
+                    break
         return samples
 
     def preprocessing(self, img):
