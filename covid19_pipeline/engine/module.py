@@ -10,6 +10,7 @@ from torchline.engine import MODULE_REGISTRY, DefaultModule, build_module
 from torchline.utils import AverageMeterGroup, topk_acc
 
 from .utils import mixup_data, mixup_loss_fn
+from medcam import medcam
 
 __all__ = [
     'CTModule'
@@ -86,15 +87,22 @@ class CTModule(DefaultModule):
             print(batch_idx, paths)
             pass
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx, test=False):
         """
         Lightning calls this inside the validation loop
         :param batch:
         :return:
         """
+        if test:
+            print("Inject grad cam")
+            print(self.model)
+            self.model = medcam.inject(self.model, output_dir='attention_maps', label=1, save_maps=True)
+            print(self.model)
         inputs, gt_labels, paths = batch
         self.inputs = inputs
         predictions = self.forward(inputs)
+        _, pred = torch.max(predictions, dim=1)
+        print(pred)
 
         loss_val = self.loss(predictions, gt_labels)
 
@@ -160,7 +168,7 @@ class CTModule(DefaultModule):
         return result
 
     def test_step(self, batch, batch_idx):
-        return self.validation_step(batch, batch_idx)
+        return self.validation_step(batch, batch_idx, test=True)
 
     def test_epoch_end(self, outputs):
         result = self.validation_epoch_end(outputs)

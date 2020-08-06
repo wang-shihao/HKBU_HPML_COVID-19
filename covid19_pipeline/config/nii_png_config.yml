@@ -36,7 +36,7 @@ abtfs:
 dataloader:
     num_workers: 40
     sample_test: 'default'
-    sample_train: 'default'
+    sample_train: 'WeightedRandomSampler'
 dataset:
     batch_size: 8
     dir: '/home/datasets/MosMedData/COVID19_1110/pngs'
