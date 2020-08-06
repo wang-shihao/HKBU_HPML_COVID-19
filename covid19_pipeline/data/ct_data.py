@@ -39,7 +39,7 @@ def CTDataset(cfg):
     img_size = cfg.input.size
     transforms = build_transforms(cfg)
     label_transforms = build_label_transforms(cfg)
-    return _CTDataset(root_dir, data_list, is_train, is_color, is_3d, img_size, slice_num, loader, data_percent,
+    return _CTDataset(root_dir, data_list, is_train, is_color, is_3d, img_size, slice_num, data_percent, loader,
                     transforms, label_transforms)
 
 class _CTDataset(torch.utils.data.Dataset):
@@ -88,7 +88,7 @@ class _CTDataset(torch.utils.data.Dataset):
         idx = 0
         for cls_ in data:
             count = 0
-            total = self.cls_scan_num[cls]
+            total = self.cls_scan_num[cls_]
             for pid in data[cls_]:
                 for scan_id in data[cls_][pid]:
                     slices = data[cls_][pid][scan_id]
