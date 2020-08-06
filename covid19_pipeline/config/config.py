@@ -15,6 +15,8 @@ def add_config(cfg):
     cfg.dataset.slice_num = 64
     cfg.dataset.is_color = False
     cfg.dataset.is_3d = True
+    cfg.dataset.subset_train = 1.0
+    cfg.dataset.subset_valid = 1.0
 
     cfg.dataloader.sampler = CN()
     cfg.dataloader.sampler.weights_cls = [0.23, 0.77] # the weight for each class

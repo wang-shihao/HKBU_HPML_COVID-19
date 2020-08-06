@@ -28,10 +28,10 @@ def CTDataset(cfg):
     data_percent = 1.0
     if is_train:
         data_list = cfg.dataset.train_list
-        data_percent = cfg.trainer.train_percent_check
+        data_percent = cfg.dataset.subset_train
     else:
         data_list = cfg.dataset.test_list
-        data_percent = cfg.trainer.val_percent_check
+        data_percent = cfg.dataset.subset_valid
     if 'Albumentation' in cfg.transforms.name:
         loader = cv2.imread
     else:
