@@ -43,9 +43,9 @@ dataset:
     is_train: False
     name: 'CTDataset'
     slice_num: 64
-    test_list: './data/ct_test.json'
-    train_list: './data/ct_train.json'
-    valid_list: './data/ct_test.json'
+    test_list: './data/ccccii/ct_test.json'
+    train_list: './data/ccccii/ct_train.json'
+    valid_list: './data/ccccii/ct_test.json'
     is_3d: False
 hooks:
     early_stopping:
