@@ -34,15 +34,15 @@ abtfs:
         scale_limit: 0.2
         shift_limit: 0.0625
 dataloader:
-    num_workers: 40
+    num_workers: 20
     sample_test: 'default'
     sample_train: 'default'
 dataset:
     batch_size: 8
-    dir: '/home/datasets/CCCCI_cleaned/dataset_seg'
+    dir: '/home/datasets/COVID-CTset_visual'
     is_train: False
     name: 'CTDataset'
-    slice_num: 64
+    slice_num: 36
     test_list: './data/covid_ctset/train1.json'
     train_list: './data/covid_ctset/test1.json'
     valid_list: './data/covid_ctset/test1.json'
@@ -80,7 +80,7 @@ loss:
     label_smoothing: 0.1
     name: 'CrossEntropy'
 model:
-    classes: 3
+    classes: 2
     finetune: False
     name: 'mc3_18'
     pretrained: False

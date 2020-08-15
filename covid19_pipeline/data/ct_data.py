@@ -72,7 +72,9 @@ class _CTDataset(torch.utils.data.Dataset):
             # png slices
             'CP': 0, 'NCP': 1, 'Normal': 2,
             # nni
-            'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1
+            'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1,
+            # covid_ctset
+            'normal': 0, 'covid': 1
         } 
         self.cls_scan_num = {} # e.g. {'CP': 1210, 'NCP': 1213, 'Normal': 772}
         self.cls_patietn_num = {} # e.g. {'CP': 778, 'NCP': 726, 'Normal': 660}
