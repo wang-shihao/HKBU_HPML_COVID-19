@@ -27,6 +27,14 @@ def add_config(cfg):
     cfg.model.n_input_channels = 1
     cfg.model.dropout = 0
 
+    # CAM
+    cfg.cam = CN()
+    cfg.cam.scan_path = '' # the path of a scan
+    cfg.cam.label = ''
+    cfg.cam.pool_name = 'glob_avgpool' # the name of global average pool in model
+    cfg.cam.save_path = './cam_results'
+    cfg.cam.debug = False
+
     ################################################################
     # ct transforms                                                #
     # https://torchio.readthedocs.io/                              #

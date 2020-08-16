@@ -24,6 +24,7 @@ class CTModule(DefaultModule):
         self.example_input_array = torch.rand(1, 3, 2, h, w)
         self.crt_batch_idx = 0
         self.inputs = self.example_input_array
+        self.is_inject_cam = False # the flag of injecting cam hook by med-cam
 
     def training_step_end(self, output):
         self.print_log(self.trainer.batch_idx, True, self.inputs, self.train_meters)
@@ -93,7 +94,7 @@ class CTModule(DefaultModule):
         :param batch:
         :return:
         """
-        if test:
+        if test and (not self.is_inject_cam):
             print("Inject grad cam")
             print(self.model)
             self.model = medcam.inject(self.model, output_dir='attention_maps', label=1, save_maps=True)
@@ -168,6 +169,7 @@ class CTModule(DefaultModule):
         return result
 
     def test_step(self, batch, batch_idx):
+        self.is_inject_cam = True
         return self.validation_step(batch, batch_idx, test=True)
 
     def test_epoch_end(self, outputs):
