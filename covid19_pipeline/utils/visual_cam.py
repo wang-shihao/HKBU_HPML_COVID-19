@@ -137,6 +137,7 @@ class CAM:
                 cmap=plt.cm.rainbow)
         cbar = plt.colorbar()
         cbar.ax.tick_params(labelsize=20)
+        plt.savefig("filename.png")
         plt.show()
 
 def register_hook(model, pool_name=None):
