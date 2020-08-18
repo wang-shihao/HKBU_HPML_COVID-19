@@ -37,7 +37,7 @@ def main(hparams):
         trainer.test(model)
     elif hasattr(hparams, "cam_only") and hparams.cam_only:
         model = build_module(cfg)
-        cam = utils.CAM(cfg, model)
+        cam = utils.CAM3D(cfg, model)
         cam.run()
     else:
         model = build_module(cfg)

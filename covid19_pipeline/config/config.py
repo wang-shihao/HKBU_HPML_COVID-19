@@ -31,9 +31,11 @@ def add_config(cfg):
     cfg.cam = CN()
     cfg.cam.scan_path = '' # the path of a scan
     cfg.cam.label = ''
-    cfg.cam.pool_name = 'glob_avgpool' # the name of global average pool in model
+    cfg.cam.featmaps_module_name = 'glob_avgpool' # the module name of hook
+    cfg.cam.weights_module_name = 'fc' # the module name of hook
     cfg.cam.save_path = './cam_results'
-    cfg.cam.debug = False
+    cfg.cam.model_path = '' # load the params of the model
+    cfg.cam.debug = False # if True, use FakeNet3D and FakeData to debug
 
     ################################################################
     # ct transforms                                                #
