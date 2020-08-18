@@ -31,7 +31,11 @@ class BaseCAM3D:
     def restore_model(self, model):
         try:
             model_path = self.cfg.cam.model_path
-            ckpt = torch.load(model_path)
+            if torch.cuda.is_available():
+                device = torch.device('cuda')
+            else:
+                device = torch.device('cpu')
+            ckpt = torch.load(model_path, map_location=device)
             model.load_state_dict(ckpt['state_dict'])
             print(f'loading from {model_path}')
         except:
@@ -75,13 +79,17 @@ class BaseCAM3D:
         fig = plt.figure(figsize=(10, 10))
         plt.subplot(1, 1, 1)
         plt.axis('off')
+        # mixed_img = slice_img + 0.2*slice_cam
+        # mixed_img = mixed_img.astype(int)
+        # plt.imshow(mixed_img)
         plt.imshow(slice_img, cmap=plt.cm.Greys_r, interpolation=None,
                 vmax=1., vmin=0.)
+        slice_cam[slice_cam>0.3]=1
         plt.imshow(slice_cam,
-                interpolation=None, vmax=1., vmin=.0, alpha=1,
-                cmap=plt.cm.rainbow)
+                interpolation=None, vmax=1., vmin=.0, alpha=0.3,
+                cmap=plt.cm.gist_heat)
         cbar = plt.colorbar()
-        cbar.ax.tick_params(labelsize=20)
+        cbar.ax.tick_params(labelsize=10)
         plt.savefig(filename)
     
     @classmethod
