@@ -126,7 +126,7 @@ trainer:
     default_root_dir: './output'
     distributed_backend: 'dp'
     fast_dev_run: False
-    gpus: [0, 1]
+    gpus: [0]
     gradient_clip_val: 0
     log_gpu_memory: ''
     log_save_interval: 100
