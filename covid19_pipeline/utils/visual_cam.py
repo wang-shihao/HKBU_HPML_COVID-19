@@ -201,6 +201,7 @@ class CAM3D(BaseCAM3D):
 
         # model
         model = self.register_hook(self.model, self.featmaps_module_name, self.weights_module_name)
+        model.eval()
 
         # cam
         cam = self.get_cam(scan, model)

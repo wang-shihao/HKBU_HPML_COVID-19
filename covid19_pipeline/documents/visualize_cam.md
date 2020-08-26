@@ -66,7 +66,7 @@ cam.debug = False # 用于调试用的，使用构造的模拟数据。
 运行如下命令
 
 ```c
-python main.py --cam_only --config_file ./output/torchline_logs/version_0/config.yml cam.model_path ./output/torchline_logs/version_0/checkpoints/epoch\=0-valid_acc_1\=12.50.ckpt cam.debug True
+python main.py --cam_only --config_file ./output/torchline_logs/version_0/config.yml cam.model_path ./output/torchline_logs/version_0/checkpoints/epoch\=0-valid_acc_1\=12.50.ckpt cam.debug True cam.scan_path /home/datasets/CCCCI_cleaned/dataset_seg/CP/1083/3128
 ```
 
 最后会得到一个`cam_results`文件夹，里面保存了每个slice image的热力图，效果如下图示：
