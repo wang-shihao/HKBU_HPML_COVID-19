@@ -27,6 +27,16 @@ def add_config(cfg):
     cfg.model.n_input_channels = 1
     cfg.model.dropout = 0
 
+    # CAM
+    cfg.cam = CN()
+    cfg.cam.scan_path = '' # the path of a scan
+    cfg.cam.label = ''
+    cfg.cam.featmaps_module_name = 'glob_avgpool' # the module name of hook
+    cfg.cam.weights_module_name = 'fc' # the module name of hook
+    cfg.cam.save_path = './cam_results'
+    cfg.cam.model_path = '' # load the params of the model
+    cfg.cam.debug = False # if True, use FakeNet3D and FakeData to debug
+
     ################################################################
     # ct transforms                                                #
     # https://torchio.readthedocs.io/                              #
