@@ -14,7 +14,7 @@ def scandir(nii_path, save_path):
  
             for f in filenames:
                 p.apply_async(nii2png, (f, subdir, nii_dir, save_path,)) 
-                # nii2png(f, subdir, nii_dir, save_path)
+#                nii2png(f, subdir, nii_dir, save_path)
 
     p.close()
     p.join()
@@ -34,8 +34,8 @@ def nii2png(f, subdir, nii_dir, save_path):
     
     (x,y,z) = img.shape
     for i in range(z):                      
-        silce = img_fdata[i, :, :]          
-        imageio.imwrite(os.path.join(png_path,'{}.png'.format(str(i).zfill(4))), silce)
+        slice = img_fdata[:, :, i]          
+        imageio.imwrite(os.path.join(png_path,'{}.png'.format(str(i).zfill(4))), slice)
 
  
 if __name__ == '__main__':

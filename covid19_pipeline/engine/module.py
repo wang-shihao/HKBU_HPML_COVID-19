@@ -24,6 +24,10 @@ class CTModule(DefaultModule):
         self.example_input_array = torch.rand(1, 3, 2, h, w)
         self.crt_batch_idx = 0
         self.inputs = self.example_input_array
+        print(self.model)
+        for n,m in self.model.named_modules():
+            print(n)
+        self.injected = False
 
     def training_step_end(self, output):
         self.print_log(self.trainer.batch_idx, True, self.inputs, self.train_meters)
@@ -87,22 +91,22 @@ class CTModule(DefaultModule):
             print(batch_idx, paths)
             pass
 
+
     def validation_step(self, batch, batch_idx, test=False):
         """
         Lightning calls this inside the validation loop
         :param batch:
         :return:
         """
-        if test:
+        if test and not self.injected:
             print("Inject grad cam")
-            print(self.model)
-            self.model = medcam.inject(self.model, output_dir='attention_maps', label=1, save_maps=True)
-            print(self.model)
+            self.model = medcam.inject(self.model, layer=("layer4"), output_dir='attention_maps', backend='gcampp', label=1,  save_maps=True)
+            self.injected=True
         inputs, gt_labels, paths = batch
         self.inputs = inputs
         predictions = self.forward(inputs)
         _, pred = torch.max(predictions, dim=1)
-        print(pred)
+        #print(pred)
 
         loss_val = self.loss(predictions, gt_labels)
 

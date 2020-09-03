@@ -1,0 +1,1 @@
+srun -N 1 -n 1 --gres=gpu:4 --nodelist=hkbugpusrv05 python3.6 main.py --test_only --config_file ./config/nii_config.yml trainer.gpus [0] dataloader.num_workers 0 model.name resnet3d model.model_depth 50 dataset.slice_num 64 dataset.batch_size 12 trainer.logger.test_tube.name nii_resnet50_3d_1ch

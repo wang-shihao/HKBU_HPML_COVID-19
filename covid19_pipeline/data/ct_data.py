@@ -28,6 +28,7 @@ def CTDataset(cfg):
     data_percent = 1.0
     if is_train:
         data_list = cfg.dataset.train_list
+        print(data_list)
         data_percent = cfg.dataset.subset_train
     else:
         data_list = cfg.dataset.test_list
