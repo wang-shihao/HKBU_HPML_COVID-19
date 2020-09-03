@@ -27,7 +27,7 @@ class CTModule(DefaultModule):
         print(self.model)
         for n,m in self.model.named_modules():
             print(n)
-        self.injected = False
+        self.is_inject_cam = False # the flag of injecting cam hook by med-cam
 
     def training_step_end(self, output):
         self.print_log(self.trainer.batch_idx, True, self.inputs, self.train_meters)
@@ -98,7 +98,7 @@ class CTModule(DefaultModule):
         :param batch:
         :return:
         """
-        if test and not self.injected:
+        if test and (not self.is_inject_cam):
             print("Inject grad cam")
             self.model = medcam.inject(self.model, layer=("layer4"), output_dir='attention_maps', backend='gcampp', label=1,  save_maps=True)
             self.injected=True
@@ -172,6 +172,7 @@ class CTModule(DefaultModule):
         return result
 
     def test_step(self, batch, batch_idx):
+        self.is_inject_cam = True
         return self.validation_step(batch, batch_idx, test=True)
 
     def test_epoch_end(self, outputs):
