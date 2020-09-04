@@ -1,1 +1,0 @@
-srun -N 1 -n 1 --gres=gpu:4 --nodelist=hkbugpusrv02 python3.6 main.py --config_file ./config/png_mixed_config.yml trainer.gpus [0,1,2,3] dataset.slice_num 16 dataset.batch_size 100 trainer.logger.test_tube.name png_mixed_resnext101_3d_1ch_s16
