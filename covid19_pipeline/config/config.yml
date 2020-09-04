@@ -43,9 +43,9 @@ dataset:
     is_train: False
     name: 'CTDataset'
     slice_num: 64
-    test_list: './data/ct_test.json'
-    train_list: './data/ct_train.json'
-    valid_list: './data/ct_test.json'
+    test_list: './data/ccccii/ct_test.json'
+    train_list: './data/ccccii/ct_train.json'
+    valid_list: './data/ccccii/ct_test.json'
 hooks:
     early_stopping:
         min_delta: 0.0
@@ -126,7 +126,7 @@ trainer:
     default_root_dir: './output'
     distributed_backend: 'dp'
     fast_dev_run: False
-    gpus: [0, 1]
+    gpus: [0]
     gradient_clip_val: 0
     log_gpu_memory: ''
     log_save_interval: 100

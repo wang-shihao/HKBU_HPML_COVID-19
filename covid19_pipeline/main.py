@@ -15,6 +15,7 @@ from torchline.trainer import build_trainer
 from torchline.utils import Logger
 
 from config.config import add_config
+import utils
 import models
 import losses
 import data
@@ -34,6 +35,10 @@ def main(hparams):
         model = build_module(cfg)
         trainer = build_trainer(cfg, hparams)
         trainer.test(model)
+    elif hasattr(hparams, "cam_only") and hparams.cam_only:
+        model = build_module(cfg)
+        cam = utils.CAM3D(cfg, model)
+        cam.run()
     else:
         model = build_module(cfg)
         trainer = build_trainer(cfg, hparams)
@@ -52,6 +57,7 @@ if __name__ == '__main__':
     # gpu args
     parent_parser.add_argument("--config_file", default="./config/config.yml", metavar="FILE", help="path to config file")
     parent_parser.add_argument('--test_only', action='store_true', help='if true, return trainer.test(model). Validates only the test set')
+    parent_parser.add_argument('--cam_only', action='store_true', help='if true, save heatmap by CAM')
     parent_parser.add_argument('--predict_only', action='store_true', help='if true run model(samples). Predict on the given samples.')
     parent_parser.add_argument( "opts", help="Modify config options using the command-line", default=None, nargs=argparse.REMAINDER)
 
