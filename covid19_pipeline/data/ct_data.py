@@ -72,7 +72,7 @@ class _CTDataset(torch.utils.data.Dataset):
             # png slices
             'CP': 0, 'NCP': 1, 'Normal': 2,
             # nni
-            'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1,
+            'CT-0': 0, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1,
             # covid_ctset
             'normal': 0, 'covid': 1
         } 
@@ -163,7 +163,6 @@ class _CTDataset(torch.utils.data.Dataset):
         sample = self.samples[idx]
         label = torch.tensor(sample['label']).long()
         # stack & sample slice
-        #print('1\n' * 5)
         if sample['slices'][0].endswith('.nii') or sample['slices'][0].endswith('.nii.gz'):
             slice_tensor = self.get_nifti(sample)
         else:

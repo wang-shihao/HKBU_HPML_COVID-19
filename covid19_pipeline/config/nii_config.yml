@@ -34,18 +34,18 @@ abtfs:
         scale_limit: 0.2
         shift_limit: 0.0625
 dataloader:
-    num_workers: 40
+    num_workers: 20
     sample_test: 'default'
-    sample_train: 'WeightedRandomSampler'
+    sample_train: 'default'
 dataset:
     batch_size: 8
     dir: '/home/datasets/MosMedData/COVID19_1110/studies'
     is_train: False
     name: 'CTDataset'
-    slice_num: 64
-    test_list: './data/nii_test.json'
-    train_list: './data/nii_train.json'
-    valid_list: './data/nii_test.json'
+    slice_num: 32
+    test_list: './data/mosmed/nii_test.json'
+    train_list: './data/mosmed/nii_train.json'
+    valid_list: './data/mosmed/nii_test.json'
 hooks:
     early_stopping:
         min_delta: 0.0
@@ -65,7 +65,7 @@ hooks:
         setting: 2
         verbose: 1
 input:
-    size: (128, 128)
+    size: (512, 512)
 label_transforms:
     name: 'default'
 log:
@@ -80,7 +80,7 @@ loss:
     label_smoothing: 0.1
     name: 'CrossEntropy'
 model:
-    classes: 3
+    classes: 2
     finetune: False
     name: 'mc3_18'
     pretrained: False
@@ -126,7 +126,7 @@ trainer:
     default_root_dir: './output'
     distributed_backend: 'dp'
     fast_dev_run: False
-    gpus: [0, 1]
+    gpus: [0]
     gradient_clip_val: 0
     log_gpu_memory: ''
     log_save_interval: 100
