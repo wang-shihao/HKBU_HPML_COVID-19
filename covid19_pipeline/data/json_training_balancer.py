@@ -55,5 +55,5 @@ cls_dict['CP'] = cls_dict.pop(0)
 
 outfile = open(filename.replace('.json', '_balanced.json'), 'w')
 
-json.dump(cls_dict, outfile, indent=4)
+#json.dump(cls_dict, outfile, indent=4)
 
