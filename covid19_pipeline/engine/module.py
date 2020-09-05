@@ -93,16 +93,10 @@ class CTModule(DefaultModule):
         :param batch:
         :return:
         """
-        if test:
-            print("Inject grad cam")
-            print(self.model)
-            self.model = medcam.inject(self.model, output_dir='attention_maps', label=1, save_maps=True)
-            print(self.model)
         inputs, gt_labels, paths = batch
         self.inputs = inputs
         predictions = self.forward(inputs)
         _, pred = torch.max(predictions, dim=1)
-        print(pred)
 
         loss_val = self.loss(predictions, gt_labels)
 

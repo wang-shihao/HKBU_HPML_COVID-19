@@ -53,8 +53,6 @@ class ResNeXt(ResNet):
                  cardinality=32,
                  classes=400):
         block = partialclass(block, cardinality=cardinality)
-        print("Block inplanes")
-        print(block_inplanes)
         super().__init__(block, layers, block_inplanes, n_input_channels,
                          conv1_t_size, conv1_t_stride, no_max_pool,
                          shortcut_type, 
