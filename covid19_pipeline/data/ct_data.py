@@ -135,7 +135,7 @@ class _CTDataset(torch.utils.data.Dataset):
         h, w = self.img_size[0], self.img_size[1]
         size = (h*5//4, w*5//4)
         slice_tensor = torch.nn.functional.interpolate(slice_tensor, size) # resize
-        slice_tensor = slice_tensor[:, :, size[0]-h//2:size[0]+h//2, size[1]-w//2:size[1]+w//2] # centercrop
+        slice_tensor = slice_tensor[:, :, size[0]//2-h//2:size[0]//2+h//2, size[1]//2-w//2:size[1]//2+w//2] # centercrop
 
         return slice_tensor
 
