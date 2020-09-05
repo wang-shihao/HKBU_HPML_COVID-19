@@ -42,7 +42,7 @@ dataset:
     dir: '/home/datasets/MosMedData/COVID19_1110/studies'
     is_train: False
     name: 'CTDataset'
-    slice_num: 32
+    slice_num: 40
     test_list: './data/mosmed/nii_test.json'
     train_list: './data/mosmed/nii_train_mixed.json'
     valid_list: './data/mosmed/nii_test.json'
