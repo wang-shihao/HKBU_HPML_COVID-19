@@ -187,7 +187,7 @@ class CAM3D(BaseCAM3D):
         # cam
         feat_num = weights.shape[1]
         feat_size = feat_maps.shape[2:]
-        idx = self.label if self.label else preds.argmax(1)
+        idx = int(self.label) if self.label>=0 else preds.argmax(1)
         cam = np.dot(weights[idx].reshape(1, feat_num),
                             feat_maps[0].reshape(feat_num, -1)).reshape(1, *feat_size) # d*h*w
         cam = (cam - np.min(cam)) / np.max(cam)

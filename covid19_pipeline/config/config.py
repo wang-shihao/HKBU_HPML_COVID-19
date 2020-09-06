@@ -30,7 +30,7 @@ def add_config(cfg):
     # CAM
     cfg.cam = CN()
     cfg.cam.scan_path = '' # the path of a scan
-    cfg.cam.label = ''
+    cfg.cam.label = -1
     cfg.cam.featmaps_module_name = 'glob_avgpool' # the module name of hook
     cfg.cam.weights_module_name = 'fc' # the module name of hook
     cfg.cam.save_path = './cam_results'

@@ -138,6 +138,9 @@ class DenseNet(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
+        # global avg pool
+        self.glob_avg_pool = nn.AdaptiveAvgPool3d((1, 1, 1))
+
         # Linear layer
         self.classifier = nn.Linear(num_features, classes)
 
@@ -155,9 +158,10 @@ class DenseNet(nn.Module):
     def forward(self, x):
         features = self.features(x)
         out = F.relu(features, inplace=True)
-        out = F.adaptive_avg_pool3d(out,
-                                    output_size=(1, 1,
-                                                 1)).view(features.size(0), -1)
+        out = self.glob_avg_pool(out).view(features.size(0), -1)
+        # out = F.adaptive_avg_pool3d(out,
+        #                             output_size=(1, 1,
+        #                                          1)).view(features.size(0), -1)
         out = self.classifier(out)
         return out
 
