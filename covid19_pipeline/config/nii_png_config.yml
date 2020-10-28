@@ -34,11 +34,11 @@ abtfs:
         scale_limit: 0.2
         shift_limit: 0.0625
 dataloader:
-    num_workers: 40
+    num_workers: 20
     sample_test: 'default'
     sample_train: 'default'
 dataset:
-    batch_size: 8
+    batch_size: 32
     dir: '/home/datasets/MosMedData/COVID19_1110/pngs'
     is_train: False
     name: 'CTDataset'
@@ -65,7 +65,7 @@ hooks:
         setting: 2
         verbose: 1
 input:
-    size: (512, 512)
+    size: (256, 256)
 label_transforms:
     name: 'default'
 log:
