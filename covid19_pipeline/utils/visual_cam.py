@@ -87,7 +87,7 @@ class BaseCAM3D:
         # slice_img=(slice_img-slice_img.min())/(slice_img.max()-slice_img.min())
         plt.imshow(slice_img, cmap=plt.cm.Greys_r, interpolation=None,
                 vmax=1., vmin=0.)
-        # slice_cam[slice_cam>0.3]=1
+#         slice_cam[slice_cam>0.3]=1
         plt.imshow(slice_cam,
                 interpolation=None, vmax=1., vmin=.0, alpha=0.3,
                 cmap=plt.cm.gist_heat)
