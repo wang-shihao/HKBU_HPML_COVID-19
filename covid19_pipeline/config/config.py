@@ -26,6 +26,7 @@ def add_config(cfg):
     cfg.model.model_depth = 101
     cfg.model.n_input_channels = 1
     cfg.model.dropout = 0
+    cfg.predict_only.weights_path = ''
 
     # CAM
     cfg.cam = CN()

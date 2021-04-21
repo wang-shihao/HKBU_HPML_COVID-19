@@ -1,0 +1,241 @@
+DEFAULT_CUDNN_BENCHMARK: True
+VERSION: 1
+abtfs:
+    blur:
+        blur_limit: 3
+        enable: 0
+    bright:
+        clip_limit: 1
+        enable: 1
+    channel_dropout:
+        drop_range: (1, 1)
+        enable: 0
+        fill_value: 127
+    channel_shuffle:
+        enable: 0
+    cutout:
+        enable: 1
+        fill_value: 127
+        num_holes: 10
+        size: 20
+    distortion:
+        enable: 0
+    hue:
+        enable: 0
+    noise:
+        enable: 1
+    random_grid_shuffle:
+        enable: 0
+        grid: 2
+    rotate:
+        enable: 1
+        p: 1
+        rotate_limit: 45
+        scale_limit: 0.2
+        shift_limit: 0.0625
+dataloader:
+    num_workers: 40
+    sample_test: 'default'
+    sample_train: 'default'
+dataset:
+    batch_size: 9
+    dir: '/home/datasets/COVID-19_CTs/3images'
+    is_train: False
+    name: 'CTDataset'
+    slice_num: 64
+    test_list: '/home/datasets/COVID-19_CTs/3datasets/3test_2cls.json'
+    train_list: '/home/datasets/COVID-19_CTs/3datasets/3train.json'
+    valid_list: '/home/datasets/COVID-19_CTs/3datasets/3test_2cls.json'
+hooks:
+    early_stopping:
+        min_delta: 0.0
+        mode: 'max'
+        monitor: 'valid_acc_1'
+        patience: 20
+        setting: 2
+        verbose: 1
+    model_checkpoint:
+        filepath: ''
+        mode: 'max'
+        monitor: 'valid_acc_1'
+        period: 1
+        prefix: ''
+        save_top_k: 1
+        save_weights_only: False
+        setting: 2
+        verbose: 1
+input:
+    size: (128, 128)
+label_transforms:
+    name: 'default'
+log:
+    name: ''
+    path: ''
+loss:
+    class_weight: []
+    focal_loss:
+        alpha: []
+        gamma: 2
+        size_average: True
+    label_smoothing: 0.1
+    name: 'CrossEntropy'
+model:
+    classes: 3
+    finetune: False
+    name: 'mc3_18'
+    pretrained: False
+    model_depth: 101
+module:
+    name: 'CTModule'
+    analyze_result: True
+optim:
+    base_lr: 0.001
+    momentum: 0.9
+    name: 'adam'
+    scheduler:
+        gamma: 0.1
+        milestones: [10, 25, 35, 50]
+        mode: 'min'
+        name: 'CosineAnnealingLR'
+        patience: 10
+        step_size: 10
+        t_0: 5
+        t_max: 100
+        t_mul: 20
+        verbose: True
+    weight_decay: 0.0005
+predict_only:
+    load_ckpt:
+        checkpoint_path: ''
+    load_metric:
+        map_location: 'cuda:0'
+        on_gpu: True
+        tags_csv: ''
+        weights_path: ''
+    to_pred_file_path: ''
+    type: 'ckpt'
+topk: [1, 1]
+trainer:
+    accumulate_grad_batches: 1
+    amp_level: 'O1'
+    auto_lr_find: False
+    auto_scale_batch_size: False
+    auto_select_gpus: False
+    benchmark: False
+    check_val_every_n_epoch: 1
+    default_root_dir: './output'
+    distributed_backend: 'dp'
+    fast_dev_run: False
+    gpus: [0]
+    gradient_clip_val: 0
+    log_gpu_memory: ''
+    log_save_interval: 100
+    logger:
+        mlflow:
+            experiment_name: 'torchline_logs'
+            tracking_uri: './output'
+        setting: 2
+        test_tube:
+            name: 'torchline_logs'
+            save_dir: './output'
+            version: -1
+        type: 'test_tube'
+    max_epochs: 200
+    max_steps: 99999999
+    min_epochs: 100
+    min_steps: 99999999
+    name: 'DefaultTrainer'
+    num_nodes: 1
+    num_sanity_val_steps: 5
+    num_tpu_cores: ''
+    overfit_pct: 0.0
+    precision: 32
+    print_nan_grads: True
+    process_position: 0
+    progress_bar_refresh_rate: 0
+    reload_dataloaders_every_epoch: False
+    replace_sampler_ddp: True
+    resume_from_checkpoint: ''
+    row_log_interval: 10
+    show_progress_bar: False
+    terminate_on_nan: False
+    test_percent_check: 1.0
+    track_grad_norm: -1
+    train_percent_check: 1.0
+    truncated_bptt_steps: ''
+    use_amp: False
+    val_check_interval: 1.0
+    val_percent_check: 1.0
+    weights_save_path: ''
+    weights_summary: ''
+transforms:
+    ct:
+        randomaffine:
+            degrees: (-10, 10)
+            enable: 0
+            isotropic: True
+            p: 0.5
+            scales: (0.5, 0.5)
+        randomblur:
+            enable: 0
+            p: 0.5
+            std: (0, 4)
+        randomelasticdeformation:
+            enable: 0
+            locked_borders: 0
+            max_displacement: (7, 7, 7)
+            num_control_points: (4, 4, 4)
+            p: 0.5
+        randomflip:
+            axes: (0, 1, 2)
+            enable: 1
+            flip_probability: 0.5
+            p: 0.5
+        randomnoise:
+            enable: 0
+            mean: (0, 0.25)
+            p: 0.5
+            std: (0, 0.25)
+        randomswap:
+            enable: 0
+            num_iterations: 100
+            p: 0.5
+            patch_size: (16, 16, 16)
+    img:
+        aug_cifar: False
+        aug_imagenet: False
+        center_crop:
+            enable: 0
+        color_jitter:
+            brightness: 0.1
+            contrast: 0.1
+            enable: 0
+            hue: 0.1
+            saturation: 0.1
+        random_crop:
+            enable: 1
+        random_horizontal_flip:
+            enable: 1
+            p: 0.5
+        random_resized_crop:
+            enable: 0
+            ratio: (0.75, 1.3333333333333333)
+            scale: (0.5, 1.0)
+        random_rotation:
+            degrees: 10
+            enable: 1
+        random_vertical_flip:
+            enable: 1
+            p: 0.5
+        resize:
+            enable: 1
+    name: 'CTTransforms'
+    tensor:
+        normalization:
+            mean: [0.5, 0.5, 0.5]
+            std: [0.5, 0.5, 0.5]
+        random_erasing:
+            enable: 0
+            p: 0.5
+            ratio: ((0.3, 3.3),)
+            scale: (0.02, 0.3)

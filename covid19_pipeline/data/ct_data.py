@@ -3,6 +3,7 @@ import os
 import random
 import nibabel as nib
 import imageio
+import PIL
 
 import cv2
 import torch
@@ -58,6 +59,7 @@ class _CTDataset(torch.utils.data.Dataset):
         self.is_train = is_train
         self.is_color = is_color
         self.is_3d = is_3d
+        #self.is_3d = True
         self.img_size = img_size
         self.slice_num = slice_num
         self.data_percent = data_percent
@@ -72,9 +74,10 @@ class _CTDataset(torch.utils.data.Dataset):
             # png slices
             'CP': 0, 'NCP': 1, 'Normal': 2,
             # nni
-            'CT-0': 0, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1,
+            'CT-0': 2, 'CT-1': 1, 'CT-2': 1, 'CT-3': 1, 'CT-4': 1,
             # covid_ctset
-            'normal': 0, 'covid': 1
+            'normal1': 2, 'normal': 2, 'covid': 1
+            #'normal1': 1, 'normal': 1, 'covid': 2
         } 
         self.cls_scan_num = {} # e.g. {'CP': 1210, 'NCP': 1213, 'Normal': 772}
         self.cls_patietn_num = {} # e.g. {'CP': 778, 'NCP': 726, 'Normal': 660}
@@ -110,7 +113,8 @@ class _CTDataset(torch.utils.data.Dataset):
     def preprocessing(self, img):
         resize = int(self.img_size[0]*5/4)
         transform = TF.Compose([
-            TF.Resize((resize, resize)),
+            #TF.Resize((resize, resize)),
+            TF.Resize((resize, resize), interpolation=PIL.Image.NEAREST),
             TF.CenterCrop(self.img_size),
             TF.ToTensor()
         ])
@@ -136,7 +140,10 @@ class _CTDataset(torch.utils.data.Dataset):
         size = (h*5//4, w*5//4)
         slice_tensor = torch.nn.functional.interpolate(slice_tensor, size) # resize
         slice_tensor = slice_tensor[:, :, size[0]//2-h//2:size[0]//2+h//2, size[1]//2-w//2:size[1]//2+w//2] # centercrop
-
+        #print(slice_tensor.size())
+        #if slice_tensor.size()[0] == 1:
+        #    slice_tensor = torch.cat([slice_tensor, slice_tensor, slice_tensor], dim=0)
+            
         return slice_tensor
 
     def get_png(self, sample):
@@ -153,9 +160,18 @@ class _CTDataset(torch.utils.data.Dataset):
             img = self.preprocessing(img)
             if not self.is_color:
                 img = torch.unsqueeze(img[0, :, :], dim=0)
+        #    else:
+        #        if img.size()[0] == 1:
+        #            img = torch.cat([img, img, img], dim=0)
+            
             slice_tensor.append(img)
         slice_tensor = torch.stack(slice_tensor)
         slice_tensor = slice_tensor.permute(1, 0, 2, 3) # c*d*h*w
+
+        #print(slice_tensor.size())
+        if slice_tensor.size()[0] != 1:
+            slice_tensor = torch.unsqueeze(slice_tensor[0, :, :, :], dim=0)
+
         
         return slice_tensor
 
@@ -164,17 +180,22 @@ class _CTDataset(torch.utils.data.Dataset):
         label = torch.tensor(sample['label']).long()
         # stack & sample slice
         if sample['slices'][0].endswith('.nii') or sample['slices'][0].endswith('.nii.gz'):
+            #print("nifti")
             slice_tensor = self.get_nifti(sample)
         else:
+            #print("png")
             slice_tensor = self.get_png(sample)
 
         # transform
-        if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
+        #if self.transforms: slice_tensor = self.transforms.transform(slice_tensor)
+        if self.transforms: slice_tensor = torch.Tensor.float(self.transforms.transform(slice_tensor))
         slice_tensor = (slice_tensor-slice_tensor.mean())/(slice_tensor.std()+1e-5)
         if self.label_transforms: label = self.label_transforms.transform(label)
 
         # if not 3d, then remove channel dimension
         if not self.is_3d: slice_tensor = slice_tensor[0, :, :, :]
+        #print(slice_tensor.size())
+
         return slice_tensor, label, sample['path']
 
     def __len__(self):
